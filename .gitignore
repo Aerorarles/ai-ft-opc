@@ -1,0 +1,5 @@
+configs/.env
+data/
+logs/
+*.log
+.env
