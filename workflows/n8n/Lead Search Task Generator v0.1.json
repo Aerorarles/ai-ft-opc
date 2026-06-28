@@ -1,0 +1,156 @@
+{
+  "name": "Lead Search Task Generator v0.1",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "AI FT-OPC Lead Search Task",
+        "formDescription": "Create a structured lead-search task for a product, market, and industry.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Product Name",
+              "defaultValue": "Custom Acrylic Display",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Country",
+              "defaultValue": "United States",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Industry",
+              "defaultValue": "Retail displays",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Target Lead Count",
+              "fieldType": "number",
+              "defaultValue": 30,
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Additional Notes",
+              "fieldType": "textarea",
+              "placeholder": "Optional: target company type, buyer role, city, exclusions, or special requirements"
+            }
+          ]
+        },
+        "options": {
+          "buttonLabel": "Create Search Task"
+        }
+      },
+      "id": "ff4f0101-beee-476d-a0ef-ec6d46dff5a1",
+      "name": "Lead Search Request Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "9108ed71-caae-4cc0-94c9-66b3e35b9a15"
+    },
+    {
+      "parameters": {
+        "jsCode": "const productName = ($json['Product Name'] ?? $json.product_name ?? '').trim();\nconst country = ($json['Country'] ?? $json.country ?? '').trim();\nconst industry = ($json['Industry'] ?? $json.industry ?? '').trim();\nconst rawCount = $json['Target Lead Count'] ?? $json.target_lead_count ?? 30;\nconst targetLeadCount = Math.max(1, Math.min(200, Number(rawCount) || 30));\nconst additionalNotes = ($json['Additional Notes'] ?? $json.additional_notes ?? '').trim();\n\nif (!productName || !country || !industry) {\n  throw new Error('Product Name, Country, and Industry are required.');\n}\n\nconst productQuery = productName.replace(/\\s+/g, ' ').trim();\nconst industryQuery = industry.replace(/\\s+/g, ' ').trim();\n\nconst searchQueries = [\n  `${industryQuery} companies in ${country}`,\n  `${industryQuery} distributors in ${country}`,\n  `${productQuery} buyers in ${country}`,\n  `${productQuery} suppliers customers ${country}`,\n  `site:linkedin.com/company ${industryQuery} ${country}`,\n  `site:instagram.com ${industryQuery} ${country}`,\n  `\"custom acrylic display\" ${industryQuery} ${country}`,\n  `\"retail display\" buyer ${country}`,\n];\n\nreturn [{\n  json: {\n    agent_name: 'lead_hunter',\n    task_type: 'lead_search',\n    product_name: productName,\n    country,\n    industry,\n    target_lead_count: targetLeadCount,\n    additional_notes: additionalNotes,\n    search_queries: searchQueries,\n    task_input: {\n      product_name: productName,\n      country,\n      industry,\n      target_lead_count: targetLeadCount,\n      additional_notes: additionalNotes,\n      search_queries: searchQueries,\n      sources: ['Google', 'LinkedIn', 'company websites'],\n      status_note: 'Task created. Search execution will be added in Lead Hunter v0.2.'\n    }\n  }\n}];"
+      },
+      "id": "6d3e57ae-ecd2-4658-937d-0b0aa12613a0",
+      "name": "Generate Search Plan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO agent_tasks (\n  agent_name,\n  task_type,\n  status,\n  input\n)\nVALUES (\n  $1,\n  $2,\n  'queued',\n  $3::jsonb\n)\nRETURNING\n  id,\n  agent_name,\n  task_type,\n  status,\n  input,\n  created_at;",
+        "options": {
+          "queryReplacement": "={{ [$json.agent_name, $json.task_type, JSON.stringify($json.task_input)] }}"
+        }
+      },
+      "id": "33c061ec-207b-4b88-b78b-ab68293c2c4b",
+      "name": "Create Lead Search Task",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        672,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "f9pBBR0voGwCJ8Hw",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Lead Search Task Created",
+        "completionMessage": "=Task ID: {{ $json.id }}\n\nStatus: {{ $json.status }}\n\nAgent: {{ $json.agent_name }}\n\nTask Type: {{ $json.task_type }}\n\nYour lead-search plan has been saved. The next workflow version will execute the searches and collect candidate companies.",
+        "options": {}
+      },
+      "id": "e6291b72-ec7e-448c-a1a2-10da6440122d",
+      "name": "Show Task Created",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        992,
+        0
+      ],
+      "webhookId": "3c73350d-7cd5-4084-8e35-c3b641a78b57"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Lead Search Request Form": {
+      "main": [
+        [
+          {
+            "node": "Generate Search Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Search Plan": {
+      "main": [
+        [
+          {
+            "node": "Create Lead Search Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Lead Search Task": {
+      "main": [
+        [
+          {
+            "node": "Show Task Created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "da577b47-b7a4-4a76-8056-fb72296646c9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe37a1f2a27ed7148ad1ceb412c05d0ce3464d75b08a617d89b704abe233b27e"
+  },
+  "nodeGroups": [],
+  "id": "FDrDOozUXDmZ85Y7",
+  "tags": []
+}

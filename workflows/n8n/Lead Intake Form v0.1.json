@@ -1,0 +1,153 @@
+{
+  "name": "Lead Intake Form v0.1",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "AI FT-OPC Lead Intake",
+        "formDescription": "Add a potential B2B customer for automatic lead scoring.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Company Name",
+              "placeholder": "Example: ABC Retail Displays Inc.",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Website",
+              "placeholder": "https://example.com"
+            },
+            {
+              "fieldLabel": "Country",
+              "defaultValue": "United States",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Industry",
+              "placeholder": "Retail displays / Cosmetics and beauty brands / Signage distributors",
+              "defaultValue": "Retail displays",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Contact Name",
+              "placeholder": "Example: Sarah Johnson"
+            },
+            {
+              "fieldLabel": "Contact Title",
+              "placeholder": "Purchasing Manager / Sourcing Manager / Owner"
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "placeholder": "buyer@example.com"
+            },
+            {
+              "fieldLabel": "Company Size",
+              "placeholder": "Example: 51-200"
+            },
+            {
+              "fieldLabel": "Import Signals",
+              "fieldType": "textarea",
+              "placeholder": "Enter a JSON array, e.g. [\"Uses acrylic retail displays\"]"
+            },
+            {
+              "fieldLabel": "Notes",
+              "fieldType": "textarea",
+              "placeholder": "Products, purchasing signals, company background, or other notes"
+            }
+          ]
+        },
+        "options": {
+          "buttonLabel": "Save and Score Lead"
+        }
+      },
+      "id": "743c73ab-6187-4895-8af6-12b670019c6c",
+      "name": "Lead Intake Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "2c134588-961d-44d8-8b9a-e0f21372c2bc"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO leads (\n  company_name,\n  website,\n  country,\n  industry,\n  contact_name,\n  contact_title,\n  email,\n  company_size,\n  import_signals,\n  notes,\n  source,\n  product_id\n)\nSELECT\n  $1,\n  NULLIF($2, ''),\n  $3,\n  $4,\n  NULLIF($5, ''),\n  NULLIF($6, ''),\n  NULLIF($7, ''),\n  NULLIF($8, ''),\n  COALESCE(NULLIF($9, ''), '[]')::jsonb,\n  NULLIF($10, ''),\n  'n8n_lead_form',\n  id\nFROM products\nWHERE name = 'Custom Acrylic Display'\nON CONFLICT (website) WHERE website IS NOT NULL\nDO UPDATE SET\n  company_name = EXCLUDED.company_name,\n  country = EXCLUDED.country,\n  industry = EXCLUDED.industry,\n  contact_name = EXCLUDED.contact_name,\n  contact_title = EXCLUDED.contact_title,\n  email = EXCLUDED.email,\n  company_size = EXCLUDED.company_size,\n  import_signals = EXCLUDED.import_signals,\n  notes = EXCLUDED.notes,\n  source = EXCLUDED.source,\n  product_id = EXCLUDED.product_id,\n  updated_at = NOW()\nRETURNING company_name, score, grade, priority, lead_score_breakdown;",
+        "options": {
+          "queryReplacement": "=={{ [\n  $json[\"Company Name\"],\n  $json[\"Website\"] || \"\",\n  $json[\"Country\"],\n  $json[\"Industry\"],\n  $json[\"Contact Name\"] || \"\",\n  $json[\"Contact Title\"] || \"\",\n  $json[\"Email\"] || \"\",\n  $json[\"Company Size\"] || \"\",\n  $json[\"Import Signals\"] || \"[]\",\n  $json[\"Notes\"] || \"\"\n] }}"
+        }
+      },
+      "id": "c155844c-d46c-4281-b670-d5c9d366ddb3",
+      "name": "Save Lead & Score",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        368,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "f9pBBR0voGwCJ8Hw",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Lead Saved Successfully",
+        "completionMessage": "=Company: {{ $json.company_name }}\n\nScore: {{ $json.score }}\n\nGrade: {{ $json.grade }}\n\nPriority: {{ $json.priority }}",
+        "options": {}
+      },
+      "id": "8ccf84c8-1fcd-401c-8d39-3188984c5a99",
+      "name": "Show Lead Score",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        752,
+        0
+      ],
+      "webhookId": "51b4d755-0392-4d46-abd6-2266e88a36bf"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Lead Intake Form": {
+      "main": [
+        [
+          {
+            "node": "Save Lead & Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Lead & Score": {
+      "main": [
+        [
+          {
+            "node": "Show Lead Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ba199b70-bac1-4761-877e-633a448fd6f8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe37a1f2a27ed7148ad1ceb412c05d0ce3464d75b08a617d89b704abe233b27e"
+  },
+  "nodeGroups": [],
+  "id": "2U0LdCXQTmplBj8R",
+  "tags": []
+}
