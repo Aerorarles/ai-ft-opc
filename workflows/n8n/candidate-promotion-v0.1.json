@@ -145,7 +145,8 @@
   "active": false,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": false
   },
   "versionId": "f97c996d-31c8-4f61-8e85-8e582d1e0104",
   "meta": {

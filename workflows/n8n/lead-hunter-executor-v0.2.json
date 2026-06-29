@@ -157,7 +157,8 @@
   "active": false,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": false
   },
   "versionId": "44217545-58a9-4912-afb3-ec6ee454f14b",
   "meta": {
