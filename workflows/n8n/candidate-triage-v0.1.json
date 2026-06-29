@@ -1,0 +1,124 @@
+{
+  "name": "Candidate Triage v0.2.1 - Precedence Fix Test",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "5780da7f-9882-4d4a-862c-cdbfdc5ed192",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  id,\n  page_title AS title,\n  website AS url,\n  page_snippet AS snippet,\n  company_name,\n  country,\n  industry,\n  source,\n  source_url,\n  search_query,\n  candidate_status\nFROM candidate_leads\nWHERE candidate_status = $1\nORDER BY discovered_at ASC\nLIMIT $2;",
+        "options": {
+          "queryReplacement": "={{ ['new', 50] }}"
+        }
+      },
+      "id": "e8bffd11-d330-4342-ba9f-19a70a4dae24",
+      "name": "Fetch New Candidates",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        240,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "f9pBBR0voGwCJ8Hw",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const articleTerms = [\n  'top 10',\n  'top 100',\n  'list',\n  'article',\n  'blog',\n  'resource hub',\n  'search',\n  'category',\n  'news',\n  'careers',\n  'jobs',\n];\n\nconst competitorTerms = [\n  'manufacturer',\n  'manufacturing',\n  'supplier',\n  'factory',\n  'wholesale',\n  'wholesaler',\n  'distributor',\n];\n\nconst relevanceTerms = [\n  'retail display',\n  'display fixtures',\n  'acrylic display',\n  'merchandising',\n  'signage',\n  'custom displays',\n  'store fixtures',\n];\n\nreturn $input.all().map((item) => {\n  const data = item.json;\n\n  const title = String(data.title || data.page_title || '').toLowerCase();\n  const snippet = String(data.snippet || data.page_snippet || '').toLowerCase();\n  const url = String(data.url || data.website || '').toLowerCase();\n  const companyName = String(data.company_name || '').toLowerCase();\n\n  const text = `${title} ${snippet} ${url} ${companyName}`;\n\n  const matchedArticleTerms = articleTerms.filter((term) => text.includes(term));\n  const matchedCompetitorTerms = competitorTerms.filter((term) => text.includes(term));\n  const matchedRelevanceTerms = relevanceTerms.filter((term) => text.includes(term));\n\n  let relevanceScore = 0;\n  let candidateStatus = 'low_priority';\n  let reviewNotes = '';\n\n  // 最高优先级：明显非公司页面\n  if (matchedArticleTerms.length > 0) {\n    relevanceScore = Math.max(0, matchedRelevanceTerms.length * 8 - 10);\n    candidateStatus = 'rejected';\n    reviewNotes =\n      `明显非公司内容：${matchedArticleTerms.join(', ')}。` +\n      (matchedRelevanceTerms.length\n        ? `业务相关关键词：${matchedRelevanceTerms.join(', ')}。`\n        : '');\n  } else {\n    // 业务相关性加分\n    relevanceScore += matchedRelevanceTerms.length * 10;\n\n    // 有独立官网基础分\n    if (url.startsWith('http')) {\n      relevanceScore += 8;\n    }\n\n    // 第二优先级：同行 / 渠道 / 制造商\n    if (matchedCompetitorTerms.length > 0) {\n      relevanceScore = Math.max(relevanceScore, 25);\n      candidateStatus = 'competitor_review';\n      reviewNotes =\n        `疑似竞争方、制造商或渠道商：${matchedCompetitorTerms.join(', ')}。` +\n        (matchedRelevanceTerms.length\n          ? `业务相关关键词：${matchedRelevanceTerms.join(', ')}。`\n          : '建议人工确认是否存在采购、合作或渠道机会。');\n    } else if (relevanceScore >= 35) {\n      candidateStatus = 'review';\n      reviewNotes =\n        `疑似目标公司官网。业务相关关键词：${matchedRelevanceTerms.join(', ')}。`;\n    } else {\n      candidateStatus = 'low_priority';\n      reviewNotes =\n        matchedRelevanceTerms.length > 0\n          ? `业务相关关键词较少：${matchedRelevanceTerms.join(', ')}，按低优先级保留。`\n          : '信息不足，按低优先级保留。';\n    }\n  }\n\n  return {\n    json: {\n      ...data,\n      relevance_score: relevanceScore,\n      candidate_status: candidateStatus,\n      review_notes: reviewNotes,\n      reviewed_at: new Date().toISOString(),\n    },\n  };\n});"
+      },
+      "id": "76cfe6fa-f1fb-4c35-82b3-0bec32f56978",
+      "name": "Score Candidates",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE candidate_leads\nSET\n  relevance_score = $1,\n  candidate_status = $2,\n  review_notes = $3,\n  reviewed_at = $4\nWHERE id = $5\nRETURNING\n  id,\n  page_title AS title,\n  website AS url,\n  relevance_score,\n  candidate_status,\n  review_notes,\n  reviewed_at;",
+        "options": {
+          "queryReplacement": "={{ [$json.relevance_score, $json.candidate_status, $json.review_notes, $json.reviewed_at, $json.id] }}"
+        }
+      },
+      "id": "efd787ab-8d24-4c46-8763-035c1a6f7211",
+      "name": "Update Candidate Lead",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        720,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "f9pBBR0voGwCJ8Hw",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch New Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch New Candidates": {
+      "main": [
+        [
+          {
+            "node": "Score Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Candidates": {
+      "main": [
+        [
+          {
+            "node": "Update Candidate Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "03a8ed6f-5dd7-4be4-b922-38dd79eb6038",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe37a1f2a27ed7148ad1ceb412c05d0ce3464d75b08a617d89b704abe233b27e"
+  },
+  "nodeGroups": [],
+  "id": "kutkuf9EacomAgo6",
+  "tags": []
+}

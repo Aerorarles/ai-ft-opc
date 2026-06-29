@@ -1,0 +1,158 @@
+{
+  "name": "Candidate Promotion V0.1 - Single Test",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "21dbcade-3c29-4fd2-b412-95e34f42a2b9",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  id,\n  company_name,\n  website,\n  country,\n  industry,\n  source,\n  source_url,\n  search_query,\n  page_title,\n  page_snippet,\n  raw_data,\n  candidate_status,\n  relevance_score,\n  review_notes,\n  reviewed_at\nFROM candidate_leads\nWHERE candidate_status IN ($1, $2)\nORDER BY reviewed_at DESC NULLS LAST, relevance_score DESC NULLS LAST\nLIMIT $3;",
+        "options": {
+          "queryReplacement": "={{ ['review', 'competitor_review', 50] }}"
+        }
+      },
+      "id": "9c4b83bb-b78b-443a-9c73-bd8cea211c03",
+      "name": "Fetch Reviewed Candidates",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        240,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "f9pBBR0voGwCJ8Hw",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const TEST_CANDIDATE_ID = '15250bc9-581f-4710-8a7f-ba5dd5b5e164';\nconst TEST_WEBSITE = '';\n\nconst allowedStatuses = ['review', 'competitor_review'];\nconst requestedId = TEST_CANDIDATE_ID.trim();\nconst requestedWebsite = TEST_WEBSITE.trim().toLowerCase();\n\nif (!requestedId && !requestedWebsite) {\n  throw new Error('安全停止：必须在 Code 节点中填写 TEST_CANDIDATE_ID 或 TEST_WEBSITE，且只能提升一个明确测试候选。');\n}\n\nconst matches = items.filter((item) => {\n  const row = item.json;\n  if (!allowedStatuses.includes(row.candidate_status)) {\n    return false;\n  }\n\n  if (requestedId) {\n    return String(row.id || '').toLowerCase() === requestedId.toLowerCase();\n  }\n\n  return String(row.website || '').toLowerCase() === requestedWebsite;\n});\n\nif (matches.length === 0) {\n  throw new Error('安全停止：没有找到匹配的 review 或 competitor_review 候选，未提升任何记录。');\n}\n\nif (matches.length > 1) {\n  throw new Error('安全停止：匹配到多条候选，必须使用唯一 candidate ID 或唯一 website。');\n}\n\nconst candidate = matches[0].json;\n\nif (!allowedStatuses.includes(candidate.candidate_status)) {\n  throw new Error('安全停止：候选状态不是 review 或 competitor_review，禁止提升。');\n}\n\nreturn [{\n  json: {\n    candidate_lead_id: candidate.id,\n    company_name: candidate.company_name || candidate.page_title || 'Unknown company',\n    website: candidate.website || null,\n    country: candidate.country || null,\n    industry: candidate.industry || null,\n    source: candidate.source || 'candidate_leads',\n    source_url: candidate.source_url || null,\n    search_query: candidate.search_query || null,\n    page_title: candidate.page_title || null,\n    page_snippet: candidate.page_snippet || null,\n    candidate_status: candidate.candidate_status,\n    relevance_score: candidate.relevance_score ?? null,\n    review_notes: candidate.review_notes || null,\n    candidate_raw_data: candidate.raw_data || {},\n  },\n}];"
+      },
+      "id": "b8f8e09d-3537-40e1-8e7c-f520e67ba750",
+      "name": "Select One Explicit Candidate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO leads (\n  company_name,\n  website,\n  country,\n  industry,\n  source,\n  status,\n  notes,\n  raw_data\n)\nVALUES (\n  $1,\n  $2,\n  $3,\n  $4,\n  $5,\n  $6,\n  $7,\n  jsonb_build_object(\n    'candidate_lead_id', $8::uuid,\n    'source_url', $9,\n    'search_query', $10,\n    'page_title', $11,\n    'page_snippet', $12,\n    'candidate_status', $13,\n    'candidate_relevance_score', $14,\n    'candidate_review_notes', $15,\n    'candidate_raw_data', COALESCE($16::jsonb, '{}'::jsonb)\n  )\n)\nON CONFLICT (website) WHERE website IS NOT NULL\nDO UPDATE SET\n  company_name = EXCLUDED.company_name,\n  country = EXCLUDED.country,\n  industry = EXCLUDED.industry,\n  source = EXCLUDED.source,\n  notes = EXCLUDED.notes,\n  raw_data = leads.raw_data || EXCLUDED.raw_data,\n  updated_at = NOW()\nRETURNING\n  id AS promoted_lead_id,\n  $8::uuid AS candidate_lead_id,\n  company_name,\n  website,\n  score AS lead_score,\n  grade,\n  CASE\n    WHEN grade = 'A' OR score >= 80 THEN 'high'\n    WHEN grade = 'B' OR score >= 50 THEN 'medium'\n    ELSE 'low'\n  END AS priority;",
+        "options": {
+          "queryReplacement": "={{ [$json.company_name, $json.website, $json.country, $json.industry, $json.source, 'new', $json.review_notes, $json.candidate_lead_id, $json.source_url, $json.search_query, $json.page_title, $json.page_snippet, $json.candidate_status, $json.relevance_score, $json.review_notes, JSON.stringify($json.candidate_raw_data || {})] }}"
+        }
+      },
+      "id": "8c91731d-ade9-462d-8dbf-6420d9dc039c",
+      "name": "Promote Into Leads",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        720,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "f9pBBR0voGwCJ8Hw",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE candidate_leads\nSET\n  promoted_to_lead_id = $1::uuid,\n  candidate_status = $2,\n  reviewed_at = NOW(),\n  review_notes = CONCAT(\n    COALESCE(review_notes, ''),\n    CASE WHEN COALESCE(review_notes, '') = '' THEN '' ELSE ' | ' END,\n    $3\n  )\nWHERE id = $4::uuid\n  AND candidate_status IN ($5, $6)\nRETURNING\n  $7 AS company_name,\n  $8::integer AS lead_score,\n  $9 AS grade,\n  $10 AS priority,\n  promoted_to_lead_id AS promoted_lead_id,\n  id AS candidate_lead_id,\n  candidate_status;",
+        "options": {
+          "queryReplacement": "={{ [$json.promoted_lead_id, 'promoted', '人工手动提升到 leads.id=' + $json.promoted_lead_id, $json.candidate_lead_id, 'review', 'competitor_review', $json.company_name, $json.lead_score, $json.grade, $json.priority] }}"
+        }
+      },
+      "id": "dca17833-0f1a-4f99-a2c9-67dfcd50504e",
+      "name": "Mark Candidate Promoted",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        960,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "f9pBBR0voGwCJ8Hw",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Reviewed Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Reviewed Candidates": {
+      "main": [
+        [
+          {
+            "node": "Select One Explicit Candidate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select One Explicit Candidate": {
+      "main": [
+        [
+          {
+            "node": "Promote Into Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Promote Into Leads": {
+      "main": [
+        [
+          {
+            "node": "Mark Candidate Promoted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f97c996d-31c8-4f61-8e85-8e582d1e0104",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe37a1f2a27ed7148ad1ceb412c05d0ce3464d75b08a617d89b704abe233b27e"
+  },
+  "nodeGroups": [],
+  "id": "JQZL5xJ4wbkTCT6q",
+  "tags": []
+}

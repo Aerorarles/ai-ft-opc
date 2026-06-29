@@ -1,0 +1,170 @@
+{
+  "name": "Lead Hunter Executor v0.2.1 - URL Normalization Test",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "c8d80c17-7216-45a7-bf09-a8bd89596d14",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  t.id AS task_id,\n  p.id AS product_id,\n  t.input->>'product_name' AS product_name,\n  t.input->>'country' AS country,\n  t.input->>'industry' AS industry,\n  t.input->'search_queries'->>0 AS search_query\nFROM agent_tasks t\nJOIN products p ON p.name = t.input->>'product_name'\nWHERE t.agent_name = 'lead_hunter'\n  AND t.task_type = 'lead_search'\n  AND t.status = 'queued'\nORDER BY t.created_at DESC\nLIMIT 1;",
+        "options": {}
+      },
+      "id": "d2ff0e5c-86b0-41a6-946a-4950759268d2",
+      "name": "Fetch Latest Queued Task",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        240,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "f9pBBR0voGwCJ8Hw",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "=keypair",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "= ={{ $json.search_query }}"
+            },
+            {
+              "name": "num",
+              "value": "10"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4bb84836-2d1c-4fc1-95eb-c4b406c07e89",
+      "name": "Search Serper",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        512,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "NZcHL1tghbV7v6QV",
+          "name": "Serper API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const task = $('Fetch Latest Queued Task').first().json;\nconst response = $input.first().json;\n\nconst organic = Array.isArray(response.organic) ? response.organic : [];\n\nfunction normalizeUrl(rawUrl) {\n  const value = String(rawUrl || '').trim();\n\n  if (!value.startsWith('http://') && !value.startsWith('https://')) {\n    return null;\n  }\n\n  // 去掉 ? 后所有查询参数，以及 # 后锚点\n  const withoutQuery = value.split('?')[0].split('#')[0];\n\n  // 提取 protocol + domain + pathname\n  const match = withoutQuery.match(/^(https?:\\/\\/[^/]+)(\\/.*)?$/i);\n\n  if (!match) {\n    return null;\n  }\n\n  const base = match[1];\n  let path = match[2] || '/';\n\n  // 首页统一为 /\n  if (path === '') {\n    path = '/';\n  }\n\n  return `${base}${path}`;\n}\n\nfunction cleanCompanyName(title) {\n  const text = String(title || '').trim();\n\n  const parts = text\n    .split(/\\s+[|–—-]\\s+/)\n    .map((item) => item.trim())\n    .filter(Boolean);\n\n  return parts[0] || text || null;\n}\n\nconst candidates = [];\n\nfor (const result of organic) {\n  const originalUrl = result.link || '';\n  const cleanWebsite = normalizeUrl(originalUrl);\n\n  if (!cleanWebsite) {\n    continue;\n  }\n\n  candidates.push({\n    json: {\n      task_id: task.task_id,\n      product_id: task.product_id,\n      company_name: cleanCompanyName(result.title),\n      website: cleanWebsite,\n      country: task.country,\n      industry: task.industry,\n      source: 'serper_google',\n      source_url: originalUrl,\n      search_query: task.search_query,\n      page_title: result.title || null,\n      page_snippet: result.snippet || null,\n      raw_data: result,\n    },\n  });\n}\n\nreturn candidates;"
+      },
+      "id": "4a096ec9-d2da-4334-9867-61350e0eb2ea",
+      "name": "Extract Candidate Companies",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO candidate_leads (\n  task_id, product_id, company_name, website, country, industry,\n  source, source_url, search_query, page_title, page_snippet, raw_data\n)\nVALUES (\n  $1::uuid, $2::uuid, $3, $4, $5, $6,\n  $7, $8, $9, $10, $11, $12::jsonb\n)\nON CONFLICT (website) WHERE website IS NOT NULL\nDO UPDATE SET\n  company_name = EXCLUDED.company_name,\n  country = EXCLUDED.country,\n  industry = EXCLUDED.industry,\n  source = EXCLUDED.source,\n  source_url = EXCLUDED.source_url,\n  search_query = EXCLUDED.search_query,\n  page_title = EXCLUDED.page_title,\n  page_snippet = EXCLUDED.page_snippet,\n  raw_data = EXCLUDED.raw_data\nRETURNING\n  id, company_name, website, country, industry,\n  candidate_status, relevance_score, discovered_at;",
+        "options": {
+          "queryReplacement": "={{ [$json.task_id, $json.product_id, $json.company_name, $json.website, $json.country, $json.industry, $json.source, $json.source_url, $json.search_query, $json.page_title, $json.page_snippet, JSON.stringify($json.raw_data)] }}"
+        }
+      },
+      "id": "1cffee28-a7b3-48ec-901d-cb431e0dd8b7",
+      "name": "Save Candidate Leads",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1040,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "f9pBBR0voGwCJ8Hw",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Latest Queued Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Latest Queued Task": {
+      "main": [
+        [
+          {
+            "node": "Search Serper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Serper": {
+      "main": [
+        [
+          {
+            "node": "Extract Candidate Companies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Candidate Companies": {
+      "main": [
+        [
+          {
+            "node": "Save Candidate Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "44217545-58a9-4912-afb3-ec6ee454f14b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe37a1f2a27ed7148ad1ceb412c05d0ce3464d75b08a617d89b704abe233b27e"
+  },
+  "nodeGroups": [],
+  "id": "xA6KrvxUoRhED0Yj",
+  "tags": []
+}
