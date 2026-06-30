@@ -13,7 +13,7 @@ SET
     END,
     'Manual review: Retail display system integrator / possible channel or upstream supply opportunity. Public website and Contact page are accessible. Approved for Lead Enrichment positive technical test only. No outreach until company type and sourcing model are manually confirmed.'
   )
-WHERE id = '9d724526-bd22-45c8-97e4-df052800ae204'::uuid
+WHERE id = '9d724526-bd22-45c8-97e4-df05280ae204'::uuid
   AND candidate_status = 'low_priority'
   AND promoted_to_lead_id IS NULL
 RETURNING
