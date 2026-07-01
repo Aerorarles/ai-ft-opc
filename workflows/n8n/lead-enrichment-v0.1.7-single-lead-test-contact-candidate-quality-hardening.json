@@ -1,0 +1,825 @@
+{
+  "name": "Lead Enrichment v0.1.7 - Single Lead Test",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "???????????????????????????\n\n?????? AI OPC ????? Lead Agent ??????????????????????? AI OPC ???????????????????????? Sales Agent?CRM?Analytics Agent ???",
+        "height": 260,
+        "width": 520,
+        "color": 5
+      },
+      "id": "717fdbe5-fad0-4ed9-9ded-53fc637737e1",
+      "name": "Safety Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3008,
+        32
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "bd60eaf3-240d-4579-9258-d1db517c17bd",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2640,
+        288
+      ],
+      "notesInFlow": true,
+      "notes": "?????????????????Webhook Trigger ??????"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "lead-id",
+              "name": "lead_id",
+              "value": "cdabf717-3c57-4586-befa-c5ee66953547",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d4d33b9c-087a-40dd-8a01-f26fa84664de",
+      "name": "Set Test Lead UUID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2400,
+        288
+      ],
+      "notesInFlow": true,
+      "notes": "??????? Lead UUID????????Acrylic Displays?"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  id,\n  company_name,\n  website,\n  email,\n  phone,\n  contact_name,\n  contact_title,\n  notes,\n  raw_data,\n  company_description,\n  contact_page_url,\n  enrichment_status\nFROM public.leads\nWHERE id = $1::uuid\nLIMIT 1;",
+        "options": {
+          "queryReplacement": "={{ [$json.lead_id] }}"
+        }
+      },
+      "id": "145c1e7f-30e6-4585-9ccd-fb226725a267",
+      "name": "Fetch One Lead",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2160,
+        288
+      ],
+      "notesInFlow": true,
+      "notes": "?? id ? public.leads ??????????????? PostgreSQL Credential?? JSON ??? credentials?"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const row = item.json;\nconst rawWebsite = String(row.website || '').trim();\n\nfunction parseHttpAddress(value) {\n  const original = String(value || '').trim();\n  if (!original) {\n    return { ok: false, error: '???????????' };\n  }\n\n  const match = original.match(/^(https?):\\/\\/([^\\/?#\\s]+)([^\\s]*)?$/i);\n  if (!match) {\n    return { ok: false, error: '?? URL ??????? http/https?' };\n  }\n\n  const protocol = match[1].toLowerCase();\n  const authority = match[2];\n  let rest = match[3] || '/';\n  let hostname = authority.replace(/:\\d+$/, '').toLowerCase();\n\n  if (!hostname || hostname.includes('@') || hostname.includes('..')) {\n    return { ok: false, error: '?? URL ???? hostname?' };\n  }\n\n  if (!/^[a-z0-9.-]+$/.test(hostname) || hostname.indexOf('.') === -1) {\n    return { ok: false, error: '?? hostname ?????' };\n  }\n\n  if (hostname.endsWith('.invalid')) {\n    return { ok: false, error: '???? .invalid ???' };\n  }\n\n  rest = rest.split('#')[0] || '/';\n  if (!rest.startsWith('/')) rest = '/' + rest;\n\n  const rootDomain = hostname.replace(/^www\\./, '');\n  return {\n    ok: true,\n    normalized: protocol + '://' + authority.toLowerCase() + rest,\n    hostname,\n    rootDomain,\n  };\n}\n\nconst parsed = parseHttpAddress(rawWebsite);\n\nif (!parsed.ok) {\n  return {\n    json: {\n      ...row,\n      lead_id: row.id,\n      company_name: row.company_name || null,\n      website: rawWebsite || null,\n      is_valid_website: false,\n      validation_error: parsed.error,\n      website_hostname: null,\n      website_root_domain: null,\n      errors: [parsed.error],\n    },\n  };\n}\n\nreturn {\n  json: {\n    ...row,\n    lead_id: row.id,\n    company_name: row.company_name || null,\n    website: parsed.normalized,\n    is_valid_website: true,\n    validation_error: null,\n    website_hostname: parsed.hostname,\n    website_root_domain: parsed.rootDomain,\n    errors: [],\n  },\n};"
+      },
+      "id": "d732a6ab-52c5-49b0-8f42-43e4d341bb1a",
+      "name": "Validate Website",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1920,
+        288
+      ],
+      "notesInFlow": true,
+      "notes": "????????????? URL?????? URL?? URL ? Node url ???????? hostname ? root domain?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "valid-website",
+              "leftValue": "={{ $json.is_valid_website }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "61af38d9-395f-497d-b9d7-3bd6ec81dbea",
+      "name": "IF Valid Website",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1680,
+        288
+      ],
+      "notesInFlow": true,
+      "notes": "?????????????????????????"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return { json: { ...item.json, running_update_preview: { lead_id: item.json.lead_id, enrichment_status: 'running', note: '????????????????????' } } };"
+      },
+      "id": "68e03e30-95c6-442f-b640-5aeeed67a3bf",
+      "name": "Prepare Running Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1440,
+        160
+      ],
+      "notesInFlow": true,
+      "notes": "?? enrichment_status=running ???????????????"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const now = new Date().toISOString();\nconst hasWebsite = Boolean(item.json.website);\nconst reason = hasWebsite ? 'invalid_website' : 'no_website';\nconst errors = [reason];\nreturn {\n  json: {\n    ...item.json,\n    homepage_url: item.json.website || null,\n    homepage_accessible: false,\n    homepage_block_reason: reason,\n    homepage_http_status: null,\n    contact_page_url_candidate: null,\n    contact_page_accessible: null,\n    contact_page_block_reason: null,\n    contact_page_http_status: null,\n    homepage_signals: null,\n    contact_signals: null,\n    extracted_emails: [],\n    extracted_phones: [],\n    errors,\n    raw_data_enrichment_v01: {\n      version: 'v0.1',\n      processed_at: now,\n      homepage_url: item.json.website || null,\n      contact_page_url: null,\n      homepage_accessible: false,\n      homepage_block_reason: reason,\n      homepage_http_status: null,\n      contact_page_accessible: null,\n      contact_page_block_reason: null,\n      contact_page_http_status: null,\n      extracted_emails: [],\n      extracted_phones: [],\n      errors,\n    },\n  },\n};"
+      },
+      "id": "3557e838-35e6-40a2-ab59-4f5b111a913b",
+      "name": "Prepare Failed Update Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1440,
+        448
+      ],
+      "notesInFlow": true,
+      "notes": "Normalizes invalid or missing website failures to invalid_website or no_website only."
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.website }}",
+        "options": {
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "text"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "fa4de8f8-00b4-4ded-b5ca-740c5ed25fcb",
+      "name": "Fetch Homepage",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1200,
+        160
+      ],
+      "notesInFlow": true,
+      "continueOnFail": true,
+      "notes": "? GET ???????????????????????????????????????? robots ?????"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const ALLOWED_ERROR_CODES = [\n  'blocked_by_cloudflare_403',\n  'access_denied_403',\n  'unauthorized_401',\n  'rate_limited_429',\n  'server_error_5xx',\n  'login_required',\n  'request_failed',\n  'invalid_website',\n  'no_website',\n  'no_contact_page',\n];\n\nfunction statusFromResponse(responseData) {\n  const candidates = [\n    responseData.statusCode,\n    responseData.status,\n    responseData.code,\n    responseData.status_code,\n    responseData.error && responseData.error.statusCode,\n    responseData.error && responseData.error.status,\n    responseData.error && responseData.error.code,\n  ];\n  for (const value of candidates) {\n    const numeric = Number(value);\n    if (Number.isInteger(numeric) && numeric >= 100 && numeric <= 599) return numeric;\n  }\n  return null;\n}\n\nfunction safeString(value) {\n  if (value === null || value === undefined) return '';\n  if (typeof value === 'string') return value;\n  if (typeof value === 'number' || typeof value === 'boolean') return String(value);\n  return '';\n}\n\nfunction htmlFromResponse(responseData) {\n  const candidates = [responseData.data, responseData.body, responseData.response];\n  for (const value of candidates) {\n    const text = safeString(value);\n    if (text.trim()) return text;\n  }\n  return '';\n}\n\nfunction detectionText(responseData, html) {\n  return [\n    html,\n    responseData.message,\n    responseData.statusMessage,\n    responseData.error && responseData.error.message,\n    responseData.error && responseData.error.description,\n    responseData.error && responseData.error.code,\n  ].map((value) => safeString(value)).join(' ').toLowerCase();\n}\n\nfunction normalizeReason(reason) {\n  return ALLOWED_ERROR_CODES.includes(reason) ? reason : 'request_failed';\n}\n\nfunction detectFailureReason(statusCode, text, responseData) {\n  const cloudflare = text.includes('just a moment')\n    || text.includes('enable javascript and cookies')\n    || text.includes('challenges.cloudflare.com')\n    || text.includes('cloudflare');\n  const timeout = text.includes('timeout') || text.includes('econnaborted') || text.includes('etimedout');\n\n  if (statusCode === 403 && cloudflare) return 'blocked_by_cloudflare_403';\n  if (statusCode === 401) return 'unauthorized_401';\n  if (statusCode === 403) return 'access_denied_403';\n  if (statusCode === 429) return 'rate_limited_429';\n  if (statusCode >= 500) return 'server_error_5xx';\n  if (text.includes('login required') || text.includes('please log in') || text.includes('sign in required')) return 'login_required';\n  if (timeout) return 'request_failed';\n  if (responseData.error) return 'request_failed';\n  return 'request_failed';\n}\n\nfunction sanitizedErrors(values) {\n  const result = [];\n  for (const value of values || []) {\n    const text = String(value || '').toLowerCase();\n    let code = null;\n    for (const allowed of ALLOWED_ERROR_CODES) {\n      if (text === allowed || text.endsWith(':' + allowed) || text.includes(allowed)) {\n        code = allowed;\n        break;\n      }\n    }\n    if (!code) {\n      if (text.includes('no website') || text.includes('???')) code = 'no_website';\n      else if (text.includes('invalid') || text.includes('??')) code = 'invalid_website';\n      else if (text.includes('cloudflare') || text.includes('just a moment') || text.includes('enable javascript and cookies')) code = 'blocked_by_cloudflare_403';\n      else if (text.includes('403')) code = 'access_denied_403';\n      else if (text.includes('401')) code = 'unauthorized_401';\n      else if (text.includes('429')) code = 'rate_limited_429';\n      else if (text.includes('5xx') || text.includes('500') || text.includes('502') || text.includes('503') || text.includes('504')) code = 'server_error_5xx';\n      else if (text.includes('login')) code = 'login_required';\n      else code = 'request_failed';\n    }\n    if (!result.includes(code)) result.push(code);\n  }\n  return result;\n}\n\nconst lead = $('Prepare Running Update').first().json;\nconst response = item.json || {};\nconst status = statusFromResponse(response);\nconst html = htmlFromResponse(response);\nconst text = detectionText(response, html);\n\nlet accessible = false;\nlet reason = null;\nif (status >= 200 && status < 300) {\n  accessible = html.trim().length > 0;\n  reason = accessible ? null : 'request_failed';\n} else {\n  reason = normalizeReason(detectFailureReason(status, text, response));\n}\n\nconst errors = sanitizedErrors([...(lead.errors || []), ...(accessible ? [] : [reason])]);\n\nreturn {\n  json: {\n    ...lead,\n    homepage_url: lead.website,\n    homepage_accessible: accessible,\n    homepage_block_reason: accessible ? null : reason,\n    homepage_http_status: status,\n    homepage_html: accessible ? html : undefined,\n    homepage_response_body: undefined,\n    errors,\n  },\n};"
+      },
+      "id": "66778f0a-10f5-455d-b1d5-39ef50461f2e",
+      "name": "Detect Homepage Access Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1088,
+        160
+      ],
+      "notesInFlow": true,
+      "notes": "Routes successful 2xx HTTP Request output by reading HTML from data/body/response into runtime-only homepage_html. Blocked or failed responses produce sanitized error codes only."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "b55a0102-0000-4000-9000-000000000022",
+              "leftValue": "={{ $json.homepage_accessible }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e5972edb-896e-43b5-a8f6-a0b0e32205e7",
+      "name": "IF Homepage Accessible",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -960,
+        160
+      ],
+      "notesInFlow": true,
+      "notes": "???????? Extract Homepage Signals??????????????????"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const data = item.json;\nconst now = new Date().toISOString();\nconst allowed = ['blocked_by_cloudflare_403', 'access_denied_403', 'unauthorized_401', 'rate_limited_429', 'server_error_5xx', 'login_required', 'request_failed', 'invalid_website', 'no_website', 'no_contact_page'];\nfunction cleanCode(value, fallback) {\n  const text = String(value || '').toLowerCase();\n  return allowed.includes(text) ? text : fallback;\n}\nfunction cleanErrors(values, fallback) {\n  const result = [];\n  for (const value of values || []) {\n    const code = cleanCode(value, null);\n    if (code && !result.includes(code)) result.push(code);\n  }\n  if (!result.length) result.push(fallback);\n  return result;\n}\nconst reason = cleanCode(data.homepage_block_reason, 'request_failed');\nconst errors = cleanErrors(data.errors, reason);\nreturn {\n  json: {\n    ...data,\n    homepage_response_body: undefined,\n    contact_response_body: undefined,\n    contact_page_url_candidate: null,\n    homepage_signals: null,\n    contact_signals: null,\n    extracted_emails: [],\n    extracted_phones: [],\n    errors,\n    raw_data_enrichment_v01: {\n      version: 'v0.1',\n      processed_at: now,\n      homepage_url: data.homepage_url || data.website || null,\n      contact_page_url: null,\n      homepage_accessible: false,\n      homepage_block_reason: reason,\n      homepage_http_status: data.homepage_http_status || null,\n      contact_page_accessible: null,\n      contact_page_block_reason: null,\n      contact_page_http_status: null,\n      extracted_emails: [],\n      extracted_phones: [],\n      errors,\n    },\n  },\n};"
+      },
+      "id": "1a60f568-2617-422f-b9d5-a13eccdc954c",
+      "name": "Prepare Homepage Blocked Update Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        400
+      ],
+      "notesInFlow": true,
+      "notes": "Builds failed writeback data with allowed error codes only. No HTML, challenge content, tokens, cookies, headers, stacks, or raw error objects are retained."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "function unique(values) { return [...new Set(values.filter(Boolean).map((value) => String(value).trim()))]; }\nfunction normalizePhone(value) {\n  const text = String(value || '').trim();\n  const hasPlus = text.startsWith('+');\n  const digits = text.replace(/\\D/g, '');\n  if (digits.length < 10 || digits.length > 15) return null;\n  if (digits.length === 11 && digits.startsWith('1')) return '+1 ' + digits.slice(1, 4) + ' ' + digits.slice(4, 7) + ' ' + digits.slice(7);\n  if (digits.length === 10) return digits.slice(0, 3) + '-' + digits.slice(3, 6) + '-' + digits.slice(6);\n  return (hasPlus ? '+' : '') + digits;\n}\nfunction phoneConfidence(raw, context, sourceKind) {\n  const value = String(raw || '').trim();\n  const digits = value.replace(/\\D/g, '');\n  const lowerContext = String(context || '').toLowerCase();\n  const hasPhoneLabel = /\\b(phone|tel|telephone|call|toll free|customer service)\\b/i.test(context || '');\n  const formatted = /^\\+?\\d{1,3}[\\s.-]+\\d/.test(value) || /\\(\\d{3}\\)\\s*\\d{3}[-\\s.]?\\d{4}/.test(value) || /\\d{3}[-\\s.]\\d{3}[-\\s.]\\d{4}/.test(value);\n  const plainDigits = /^\\d{8,12}$/.test(value.replace(/\\s/g, ''));\n  const suspicious = /\\b(19|20)\\d{2}[01]\\d[0-3]\\d\\b/.test(digits) || /\\b(19|20)\\d{2}\\b/.test(value) || /\\b(order|sku|item|product|model|part|tracking|id|timestamp|copyright)\\b/i.test(context || '');\n  if (sourceKind === 'tel' && digits.length >= 10 && digits.length <= 15 && !suspicious) return 'high';\n  if (formatted && digits.length >= 10 && digits.length <= 15 && !suspicious) return 'high';\n  if (plainDigits && hasPhoneLabel && !suspicious && digits.length >= 10 && digits.length <= 11) return 'high';\n  if ((formatted || hasPhoneLabel) && !suspicious) return 'medium';\n  return 'low';\n}\nfunction contextAround(text, start, end) {\n  const from = Math.max(0, start - 80);\n  const to = Math.min(text.length, end + 80);\n  return text.slice(from, to).replace(/\\s+/g, ' ').trim();\n}\nfunction extractPhoneCandidates(body, visibleText, sourceUrl) {\n  const candidates = [];\n  const telRegex = /href=[\"']tel:([^\"']+)[\"']/gi;\n  let telMatch;\n  while ((telMatch = telRegex.exec(body)) !== null) {\n    const raw = telMatch[1].replace(/^\\+/, '+').trim();\n    const normalized = normalizePhone(raw);\n    if (!normalized) continue;\n    candidates.push({ normalized_phone: normalized, source_url: sourceUrl, extraction_context: 'tel link', confidence: phoneConfidence(raw, 'tel link', 'tel') });\n  }\n  const formattedRegex = /(?:\\+?\\d{1,3}[\\s.-]+)?(?:\\(\\d{3}\\)|\\d{3})[\\s.-]+\\d{3}[\\s.-]+\\d{4}\\b/g;\n  let match;\n  while ((match = formattedRegex.exec(visibleText)) !== null) {\n    const raw = match[0];\n    const context = contextAround(visibleText, match.index, match.index + raw.length);\n    const normalized = normalizePhone(raw);\n    if (!normalized) continue;\n    candidates.push({ normalized_phone: normalized, source_url: sourceUrl, extraction_context: context, confidence: phoneConfidence(raw, context, 'text') });\n  }\n  const labeledPlainRegex = /\\b(?:phone|tel|telephone|call)\\b[^\\d+]{0,30}(\\+?\\d[\\d\\s.-]{8,18}\\d)/gi;\n  while ((match = labeledPlainRegex.exec(visibleText)) !== null) {\n    const raw = match[1];\n    const context = contextAround(visibleText, match.index, match.index + match[0].length);\n    const normalized = normalizePhone(raw);\n    if (!normalized) continue;\n    candidates.push({ normalized_phone: normalized, source_url: sourceUrl, extraction_context: context, confidence: phoneConfidence(raw, context, 'labeled_text') });\n  }\n  const seen = new Set();\n  return candidates.filter((candidate) => {\n    const key = candidate.normalized_phone + '|' + candidate.extraction_context;\n    if (seen.has(key)) return false;\n    seen.add(key);\n    return true;\n  });\n}\n\nconst lead = item.json;\nconst body = String(lead.homepage_html || '');\nconst sourceUrl = lead.website;\nconst errors = [...(lead.errors || [])];\nconst text = body.replace(/<script[\\s\\S]*?<\\/script>/gi, ' ').replace(/<style[\\s\\S]*?<\\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim();\nconst emails = unique((body.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/gi) || []).map((email) => email.toLowerCase()));\nconst phoneCandidates = extractPhoneCandidates(body, text, sourceUrl);\nconst highConfidencePhones = unique(phoneCandidates.filter((candidate) => candidate.confidence === 'high').map((candidate) => candidate.normalized_phone));\nconst metaDescription = body.match(/<meta[^>]+name=[\"']description[\"'][^>]+content=[\"']([^\"']+)[\"']/i)?.[1] || body.match(/<meta[^>]+content=[\"']([^\"']+)[\"'][^>]+name=[\"']description[\"']/i)?.[1] || null;\nconst companyDescription = metaDescription || text.slice(0, 500) || null;\nconst links = [];\nconst linkRegex = /<a\\b[^>]*href=[\"']([^\"']+)[\"'][^>]*>([\\s\\S]*?)<\\/a>/gi;\nlet match;\nwhile ((match = linkRegex.exec(body)) !== null) {\n  const href = match[1];\n  const label = match[2].replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim();\n  const combined = (label + ' ' + href).toLowerCase();\n  if (/contact|contact us|request quote|get a quote|quote|inquiry|get in touch/.test(combined)) links.push({ href, label, source_url: sourceUrl });\n}\nreturn { json: { ...lead, homepage_html: undefined, homepage_response_body: undefined, homepage_phone_candidates_review: phoneCandidates.filter((candidate) => candidate.confidence !== 'high'), homepage_url: sourceUrl, homepage_signals: { source_url: sourceUrl, company_description_candidate: companyDescription, extracted_emails: emails, extracted_phones: highConfidencePhones, phone_candidates_high: phoneCandidates.filter((candidate) => candidate.confidence === 'high'), contact_link_candidates: links }, extracted_emails: emails, extracted_phones: highConfidencePhones, company_description_candidate: companyDescription, contact_link_candidates: links, errors } };"
+      },
+      "id": "d93e4370-c658-49a6-b845-edd876caa2fb",
+      "name": "Extract Homepage Signals",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        128
+      ],
+      "notesInFlow": true,
+      "notes": "Extracts phones with confidence scoring. Only high-confidence formatted or labeled/tel phones enter extracted_phones; lower confidence candidates remain runtime-only."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const data = item.json;\nconst blockedDomains = ['linkedin.com', 'facebook.com', 'instagram.com', 'google.com', 'maps.google.com', 'x.com', 'twitter.com', 'youtube.com', 'youtu.be'];\nconst blockedPathTerms = ['/products/', '/product/', '/solutions/', '/industries/', '/resources/', '/news/', '/blog/', '/investor', '/investors', '/stock', '/shareholder', '/financial'];\nconst misleadingTerms = ['food-contact', 'contact-packaging', 'contact-material'];\n\nfunction parseHttpAddress(value) {\n  const raw = String(value || '').trim();\n  const match = raw.match(/^(https?):\\/\\/([^\\/?#\\s]+)([^#\\s]*)?(#.*)?$/i);\n  if (!match) return null;\n  const protocol = match[1].toLowerCase();\n  const authority = match[2];\n  const hostname = authority.replace(/:\\d+$/, '').toLowerCase();\n  let pathWithQuery = match[3] || '/';\n  if (!hostname || hostname.includes('@') || hostname.includes('..')) return null;\n  if (!/^[a-z0-9.-]+$/.test(hostname) || hostname.indexOf('.') === -1) return null;\n  if (hostname.endsWith('.invalid')) return null;\n  if (!pathWithQuery.startsWith('/')) pathWithQuery = '/' + pathWithQuery;\n  const parts = pathWithQuery.split('?');\n  let path = parts[0] || '/';\n  const query = parts.length > 1 ? parts.slice(1).join('?') : '';\n  path = path.replace(/\\/+/g, '/');\n  if (path.length > 1) path = path.replace(/\\/$/, '');\n  return { protocol, authority: authority.toLowerCase(), hostname, rootDomain: hostname.replace(/^www\\./, ''), path, query, href: protocol + '://' + authority.toLowerCase() + path + (query ? '?' + query : '') };\n}\nfunction resolveSameSiteLink(rawHref, homepageAddress) {\n  const href = String(rawHref || '').trim();\n  if (!href || href === '#' || href.startsWith('#') || /^(mailto|tel|javascript):/i.test(href)) return null;\n  if (/^https?:\\/\\//i.test(href)) return parseHttpAddress(href);\n  if (href.startsWith('//')) return parseHttpAddress(homepageAddress.protocol + ':' + href);\n  const baseRoot = homepageAddress.protocol + '://' + homepageAddress.authority;\n  if (href.startsWith('/')) return parseHttpAddress(baseRoot + href);\n  return parseHttpAddress(baseRoot + '/' + href.replace(/^\\.\\//, ''));\n}\nfunction cleanLabel(value) { return String(value || '').replace(/\\s+/g, ' ').trim(); }\nfunction isBlocked(candidate) {\n  const path = candidate.path.toLowerCase();\n  const root = candidate.rootDomain;\n  if (blockedDomains.some((domain) => root === domain || candidate.hostname === domain || candidate.hostname.endsWith('.' + domain))) return true;\n  if (blockedPathTerms.some((term) => path === term.replace(/\\/$/, '') || path.startsWith(term))) return true;\n  if (misleadingTerms.some((term) => path.includes(term))) return true;\n  return false;\n}\nfunction scoreCandidate(candidate, label) {\n  const path = candidate.path.toLowerCase();\n  const normalizedLabel = cleanLabel(label).toLowerCase();\n  let score = 0;\n  let reason = null;\n  if (['/contact', '/contact-us', '/contactus'].includes(path)) { score = 100; reason = 'exact_contact_path'; }\n  else if (path.startsWith('/contact/') || path.startsWith('/contact-us/')) { score = 80; reason = 'contact_path_prefix'; }\n  else if (['contact', 'contact us', 'get in touch', 'request a quote'].includes(normalizedLabel)) { score = 75; reason = 'exact_contact_label'; }\n  else if (/\\b(contact|quote|inquiry|get in touch)\\b/.test(normalizedLabel + ' ' + path)) { score = 40; reason = 'contact_keyword_same_domain'; }\n  if (!score) return null;\n  return { score, reason };\n}\nconst homepageAddress = parseHttpAddress(data.homepage_url || data.website);\nlet selected = null;\nconst considered = [];\nif (homepageAddress) {\n  const homeRoot = data.website_root_domain || homepageAddress.rootDomain;\n  for (const link of data.contact_link_candidates || []) {\n    const candidate = resolveSameSiteLink(link.href, homepageAddress);\n    const label = cleanLabel(link.label);\n    if (!candidate) continue;\n    if (candidate.rootDomain !== homeRoot) continue;\n    if (isBlocked(candidate)) continue;\n    const scored = scoreCandidate(candidate, label);\n    if (!scored) continue;\n    considered.push({ url: candidate.href, label, score: scored.score, reason: scored.reason, path_length: candidate.path.length, has_query: Boolean(candidate.query) });\n  }\n  considered.sort((a, b) => b.score - a.score || a.path_length - b.path_length || Number(a.has_query) - Number(b.has_query) || a.url.length - b.url.length);\n  selected = considered[0] || null;\n}\nreturn { json: { ...data, contact_page_url_candidate: selected ? selected.url : null, has_contact_page: Boolean(selected), contact_page_selection_reason: selected ? selected.reason : 'no_contact_page', contact_page_candidates_considered: considered.map(({ url, label, score, reason }) => ({ url, label, score, reason })) } };"
+      },
+      "id": "574c90dc-ff52-4daa-be01-f4454bc3a49b",
+      "name": "Find Same-Domain Contact Page",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        128
+      ],
+      "notesInFlow": true,
+      "notes": "Scores same-root-domain Contact candidates. Exact /contact paths outrank product pages; product, industry, resource, news, investor, social, mailto, tel, javascript, and misleading food-contact paths are rejected."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "contact-found",
+              "leftValue": "={{ $json.has_contact_page }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3258c1e6-680c-44b2-b8cb-9295bc6227d5",
+      "name": "IF Contact Page Found",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -240,
+        128
+      ],
+      "notesInFlow": true,
+      "notes": "?????????????????????????"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.contact_page_url_candidate }}",
+        "options": {
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "text"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "e18fd9ac-1122-49a7-bd1f-5f3e430ceb91",
+      "name": "Fetch Contact Page",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        0
+      ],
+      "notesInFlow": true,
+      "continueOnFail": true,
+      "notes": "???????? Contact ???????????????????"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const ALLOWED_ERROR_CODES = [\n  'blocked_by_cloudflare_403',\n  'access_denied_403',\n  'unauthorized_401',\n  'rate_limited_429',\n  'server_error_5xx',\n  'login_required',\n  'request_failed',\n  'invalid_website',\n  'no_website',\n  'no_contact_page',\n];\n\nfunction statusFromResponse(responseData) {\n  const candidates = [\n    responseData.statusCode,\n    responseData.status,\n    responseData.code,\n    responseData.status_code,\n    responseData.error && responseData.error.statusCode,\n    responseData.error && responseData.error.status,\n    responseData.error && responseData.error.code,\n  ];\n  for (const value of candidates) {\n    const numeric = Number(value);\n    if (Number.isInteger(numeric) && numeric >= 100 && numeric <= 599) return numeric;\n  }\n  return null;\n}\n\nfunction safeString(value) {\n  if (value === null || value === undefined) return '';\n  if (typeof value === 'string') return value;\n  if (typeof value === 'number' || typeof value === 'boolean') return String(value);\n  return '';\n}\n\nfunction htmlFromResponse(responseData) {\n  const candidates = [responseData.data, responseData.body, responseData.response];\n  for (const value of candidates) {\n    const text = safeString(value);\n    if (text.trim()) return text;\n  }\n  return '';\n}\n\nfunction detectionText(responseData, html) {\n  return [\n    html,\n    responseData.message,\n    responseData.statusMessage,\n    responseData.error && responseData.error.message,\n    responseData.error && responseData.error.description,\n    responseData.error && responseData.error.code,\n  ].map((value) => safeString(value)).join(' ').toLowerCase();\n}\n\nfunction normalizeReason(reason) {\n  return ALLOWED_ERROR_CODES.includes(reason) ? reason : 'request_failed';\n}\n\nfunction detectFailureReason(statusCode, text, responseData) {\n  const cloudflare = text.includes('just a moment')\n    || text.includes('enable javascript and cookies')\n    || text.includes('challenges.cloudflare.com')\n    || text.includes('cloudflare');\n  const timeout = text.includes('timeout') || text.includes('econnaborted') || text.includes('etimedout');\n\n  if (statusCode === 403 && cloudflare) return 'blocked_by_cloudflare_403';\n  if (statusCode === 401) return 'unauthorized_401';\n  if (statusCode === 403) return 'access_denied_403';\n  if (statusCode === 429) return 'rate_limited_429';\n  if (statusCode >= 500) return 'server_error_5xx';\n  if (text.includes('login required') || text.includes('please log in') || text.includes('sign in required')) return 'login_required';\n  if (timeout) return 'request_failed';\n  if (responseData.error) return 'request_failed';\n  return 'request_failed';\n}\n\nfunction sanitizedErrors(values) {\n  const result = [];\n  for (const value of values || []) {\n    const text = String(value || '').toLowerCase();\n    let code = null;\n    for (const allowed of ALLOWED_ERROR_CODES) {\n      if (text === allowed || text.endsWith(':' + allowed) || text.includes(allowed)) {\n        code = allowed;\n        break;\n      }\n    }\n    if (!code) {\n      if (text.includes('no website') || text.includes('???')) code = 'no_website';\n      else if (text.includes('invalid') || text.includes('??')) code = 'invalid_website';\n      else if (text.includes('cloudflare') || text.includes('just a moment') || text.includes('enable javascript and cookies')) code = 'blocked_by_cloudflare_403';\n      else if (text.includes('403')) code = 'access_denied_403';\n      else if (text.includes('401')) code = 'unauthorized_401';\n      else if (text.includes('429')) code = 'rate_limited_429';\n      else if (text.includes('5xx') || text.includes('500') || text.includes('502') || text.includes('503') || text.includes('504')) code = 'server_error_5xx';\n      else if (text.includes('login')) code = 'login_required';\n      else code = 'request_failed';\n    }\n    if (!result.includes(code)) result.push(code);\n  }\n  return result;\n}\n\nconst base = $('Find Same-Domain Contact Page').first().json;\nconst response = item.json || {};\nconst status = statusFromResponse(response);\nconst html = htmlFromResponse(response);\nconst text = detectionText(response, html);\n\nlet accessible = false;\nlet reason = null;\nif (status >= 200 && status < 300) {\n  accessible = html.trim().length > 0;\n  reason = accessible ? null : 'request_failed';\n} else {\n  reason = normalizeReason(detectFailureReason(status, text, response));\n}\n\nconst errors = sanitizedErrors([...(base.errors || []), ...(accessible ? [] : [reason])]);\n\nreturn {\n  json: {\n    ...base,\n    contact_page_accessible: accessible,\n    contact_page_block_reason: accessible ? null : reason,\n    contact_page_http_status: status,\n    contact_page_html: accessible ? html : undefined,\n    contact_response_body: undefined,\n    errors,\n  },\n};"
+      },
+      "id": "6f0d7670-f07b-4135-b547-48c9c29536cd",
+      "name": "Detect Contact Page Access Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "notesInFlow": true,
+      "notes": "Routes successful 2xx Contact output into runtime-only contact_page_html. Blocked or failed responses produce sanitized error codes only."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "b55a0102-0000-4000-9000-000000000025",
+              "leftValue": "={{ $json.contact_page_accessible }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "da7137f2-bda3-4e48-9299-6c2cfe020348",
+      "name": "IF Contact Page Accessible",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        0
+      ],
+      "notesInFlow": true,
+      "notes": "Contact ???????? Extract Contact Signals???????? Merge And Clean Result?"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "function unique(values) { return [...new Set(values.filter(Boolean).map((value) => String(value).trim()))]; }\nfunction normalizePhone(value) {\n  const text = String(value || '').trim();\n  const hasPlus = text.startsWith('+');\n  const digits = text.replace(/\\D/g, '');\n  if (digits.length < 10 || digits.length > 15) return null;\n  if (digits.length === 11 && digits.startsWith('1')) return '+1 ' + digits.slice(1, 4) + ' ' + digits.slice(4, 7) + ' ' + digits.slice(7);\n  if (digits.length === 10) return digits.slice(0, 3) + '-' + digits.slice(3, 6) + '-' + digits.slice(6);\n  return (hasPlus ? '+' : '') + digits;\n}\nfunction phoneConfidence(raw, context, sourceKind) {\n  const value = String(raw || '').trim();\n  const digits = value.replace(/\\D/g, '');\n  const hasPhoneLabel = /\\b(phone|tel|telephone|call|toll free|customer service)\\b/i.test(context || '');\n  const formatted = /^\\+?\\d{1,3}[\\s.-]+\\d/.test(value) || /\\(\\d{3}\\)\\s*\\d{3}[-\\s.]?\\d{4}/.test(value) || /\\d{3}[-\\s.]\\d{3}[-\\s.]\\d{4}/.test(value);\n  const plainDigits = /^\\d{8,12}$/.test(value.replace(/\\s/g, ''));\n  const suspicious = /\\b(19|20)\\d{2}[01]\\d[0-3]\\d\\b/.test(digits) || /\\b(19|20)\\d{2}\\b/.test(value) || /\\b(order|sku|item|product|model|part|tracking|id|timestamp|copyright)\\b/i.test(context || '');\n  if (sourceKind === 'tel' && digits.length >= 10 && digits.length <= 15 && !suspicious) return 'high';\n  if (formatted && digits.length >= 10 && digits.length <= 15 && !suspicious) return 'high';\n  if (plainDigits && hasPhoneLabel && !suspicious && digits.length >= 10 && digits.length <= 11) return 'high';\n  if ((formatted || hasPhoneLabel) && !suspicious) return 'medium';\n  return 'low';\n}\nfunction contextAround(text, start, end) {\n  const from = Math.max(0, start - 80);\n  const to = Math.min(text.length, end + 80);\n  return text.slice(from, to).replace(/\\s+/g, ' ').trim();\n}\nfunction extractPhoneCandidates(body, visibleText, sourceUrl) {\n  const candidates = [];\n  const telRegex = /href=[\"']tel:([^\"']+)[\"']/gi;\n  let telMatch;\n  while ((telMatch = telRegex.exec(body)) !== null) {\n    const raw = telMatch[1].replace(/^\\+/, '+').trim();\n    const normalized = normalizePhone(raw);\n    if (!normalized) continue;\n    candidates.push({ normalized_phone: normalized, source_url: sourceUrl, extraction_context: 'tel link', confidence: phoneConfidence(raw, 'tel link', 'tel') });\n  }\n  const formattedRegex = /(?:\\+?\\d{1,3}[\\s.-]+)?(?:\\(\\d{3}\\)|\\d{3})[\\s.-]+\\d{3}[\\s.-]+\\d{4}\\b/g;\n  let match;\n  while ((match = formattedRegex.exec(visibleText)) !== null) {\n    const raw = match[0];\n    const context = contextAround(visibleText, match.index, match.index + raw.length);\n    const normalized = normalizePhone(raw);\n    if (!normalized) continue;\n    candidates.push({ normalized_phone: normalized, source_url: sourceUrl, extraction_context: context, confidence: phoneConfidence(raw, context, 'text') });\n  }\n  const labeledPlainRegex = /\\b(?:phone|tel|telephone|call)\\b[^\\d+]{0,30}(\\+?\\d[\\d\\s.-]{8,18}\\d)/gi;\n  while ((match = labeledPlainRegex.exec(visibleText)) !== null) {\n    const raw = match[1];\n    const context = contextAround(visibleText, match.index, match.index + match[0].length);\n    const normalized = normalizePhone(raw);\n    if (!normalized) continue;\n    candidates.push({ normalized_phone: normalized, source_url: sourceUrl, extraction_context: context, confidence: phoneConfidence(raw, context, 'labeled_text') });\n  }\n  const seen = new Set();\n  return candidates.filter((candidate) => {\n    const key = candidate.normalized_phone + '|' + candidate.extraction_context;\n    if (seen.has(key)) return false;\n    seen.add(key);\n    return true;\n  });\n}\nfunction cleanWords(value) { return String(value || '').replace(/[^A-Za-z\\s'.-]/g, ' ').replace(/\\s+/g, ' ').trim(); }\nfunction hasBlockedVocabulary(value) {\n  const text = cleanWords(value).toLowerCase();\n  const blocked = [\n    'machinery', 'packaging', 'automation', 'multipack', 'ecommerce', 'end-of', 'end of',\n    'products', 'product', 'solutions', 'industries', 'industry', 'resources', 'news', 'blog',\n    'retail', 'display', 'displays', 'signage', 'fixtures', 'material', 'materials', 'food',\n    'line', 'equipment', 'systems', 'system', 'services', 'service', 'overview', 'sustainability',\n    'investors', 'careers', 'locations', 'brands', 'markets', 'innovation', 'case study', 'download'\n  ];\n  return blocked.some((term) => text.includes(term));\n}\nfunction looksLikeNavigationPhrase(value) {\n  const text = cleanWords(value);\n  const parts = text.split(' ').filter(Boolean);\n  if (parts.length > 4) return true;\n  if (/-$/.test(text) || /\\b[a-z]+-[a-z]+\\b/i.test(text)) return true;\n  const titleCaseCount = parts.filter((part) => /^[A-Z][a-zA-Z'.-]*$/.test(part)).length;\n  if (parts.length >= 2 && titleCaseCount !== parts.length) return true;\n  return false;\n}\nfunction isGenericContactText(value) {\n  const text = cleanWords(value).toLowerCase();\n  if (!text) return true;\n  const generic = ['support', 'customer service', 'sales', 'marketing', 'team', 'office', 'department', 'contact us', 'help', 'info', 'general inquiry', 'general enquiries', 'inquiry', 'enquiry', 'service', 'customer support'];\n  return generic.includes(text);\n}\nfunction isLikelyPersonalName(value) {\n  const name = cleanWords(value);\n  if (!name || isGenericContactText(name)) return false;\n  const lower = name.toLowerCase();\n  if (lower.includes('smurfit') || lower.includes('westrock')) return false;\n  if (hasBlockedVocabulary(name) || looksLikeNavigationPhrase(name)) return false;\n  if (/\\b(inc|llc|ltd|corp|corporation|company|group|packaging|display|displays|contact|support|service|sales|marketing|team|office|department)\\b/i.test(name)) return false;\n  const parts = name.split(' ').filter(Boolean);\n  if (parts.length < 2 || parts.length > 4) return false;\n  return parts.every((part) => /^[A-Z][a-zA-Z'.-]{1,}$/.test(part));\n}\nfunction normalizeTitle(value) {\n  const title = cleanWords(value);\n  if (!title || isGenericContactText(title)) return null;\n  if (hasBlockedVocabulary(title) || looksLikeNavigationPhrase(title)) return null;\n  if (/\\b(support|customer service|sales|marketing|team|office|department|contact us|help|info|general inquiry)\\b/i.test(title)) return null;\n  const parts = title.split(' ').filter(Boolean);\n  if (parts.length > 6) return null;\n  return title;\n}\nfunction extractPersonTitlePair(visibleText) {\n  const patterns = [\n    /\\b([A-Z][a-zA-Z'.-]+\\s+[A-Z][a-zA-Z'.-]+(?:\\s+[A-Z][a-zA-Z'.-]+){0,2})\\s*[,|-]\\s*([A-Z][A-Za-z\\s]{3,60})\\b/g,\n    /\\b([A-Z][a-zA-Z'.-]+\\s+[A-Z][a-zA-Z'.-]+(?:\\s+[A-Z][a-zA-Z'.-]+){0,2})\\s+\\(([A-Z][A-Za-z\\s]{3,60})\\)/g,\n  ];\n  for (const pattern of patterns) {\n    let match;\n    while ((match = pattern.exec(visibleText)) !== null) {\n      const evidence = contextAround(visibleText, match.index, match.index + match[0].length);\n      const name = cleanWords(match[1]);\n      const title = normalizeTitle(match[2]);\n      if (hasBlockedVocabulary(evidence) || looksLikeNavigationPhrase(evidence)) continue;\n      if (isLikelyPersonalName(name) && title) {\n        return { name, title, evidence, confidence: 'high' };\n      }\n    }\n  }\n  return { name: null, title: null, evidence: null, confidence: null };\n}\n\nconst base = item.json;\nconst body = String(base.contact_page_html || '');\nconst sourceUrl = base.contact_page_url_candidate;\nconst errors = [...(base.errors || [])];\nconst text = body.replace(/<script[\\s\\S]*?<\\/script>/gi, ' ').replace(/<style[\\s\\S]*?<\\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim();\nconst emails = unique((body.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/gi) || []).map((email) => email.toLowerCase()));\nconst phoneCandidates = extractPhoneCandidates(body, text, sourceUrl);\nconst highConfidencePhones = unique(phoneCandidates.filter((candidate) => candidate.confidence === 'high').map((candidate) => candidate.normalized_phone));\nconst personTitlePair = extractPersonTitlePair(text);\nreturn { json: { ...base, contact_page_html: undefined, contact_response_body: undefined, contact_phone_candidates_review: phoneCandidates.filter((candidate) => candidate.confidence !== 'high'), contact_person_candidate_review: personTitlePair.confidence === 'high' ? undefined : { reason: 'no_high_confidence_person_title_pair' }, contact_signals: { source_url: sourceUrl, candidate_emails: emails, candidate_phones: highConfidencePhones, phone_candidates_high: phoneCandidates.filter((candidate) => candidate.confidence === 'high'), candidate_contact_name: personTitlePair.name, candidate_contact_title: personTitlePair.title }, extracted_emails: unique([...(base.extracted_emails || []), ...emails]), extracted_phones: unique([...(base.extracted_phones || []), ...highConfidencePhones]), contact_name_candidate: personTitlePair.name, contact_title_candidate: personTitlePair.name ? personTitlePair.title : null, contact_person_confidence: personTitlePair.confidence, errors } };"
+      },
+      "id": "55f8f60d-a3d0-46bc-9e1f-4fae28e247c1",
+      "name": "Extract Contact Signals",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        0
+      ],
+      "notesInFlow": true,
+      "notes": "Hardens contact person extraction. Product, navigation, breadcrumb, marketing, machinery, packaging, automation, ecommerce, retail/display, and truncated hyphen phrases cannot become high-confidence contact names or titles."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const data = item.json;\nconst now = new Date().toISOString();\nconst allowed = ['blocked_by_cloudflare_403', 'access_denied_403', 'unauthorized_401', 'rate_limited_429', 'server_error_5xx', 'login_required', 'request_failed', 'invalid_website', 'no_website', 'no_contact_page'];\nfunction nonEmpty(value) { return value !== null && value !== undefined && String(value).trim() !== ''; }\nfunction first(values) { return (values || []).find(nonEmpty) || null; }\nfunction unique(values) { return [...new Set((values || []).filter(nonEmpty).map((value) => String(value).trim()))]; }\nfunction cleanCode(value) { const text = String(value || '').toLowerCase(); return allowed.includes(text) ? text : null; }\nfunction cleanErrors(values) { const result = []; for (const value of values || []) { const code = cleanCode(value); if (code && !result.includes(code)) result.push(code); } return result; }\nfunction cleanWords(value) { return String(value || '').replace(/[^A-Za-z\\s'.-]/g, ' ').replace(/\\s+/g, ' ').trim(); }\nfunction isGenericContactText(value) {\n  const text = cleanWords(value).toLowerCase();\n  const generic = ['support', 'customer service', 'sales', 'marketing', 'team', 'office', 'department', 'contact us', 'help', 'info', 'general inquiry', 'general enquiries', 'inquiry', 'enquiry', 'service', 'customer support'];\n  return !text || generic.includes(text);\n}\nfunction isLikelyPersonalName(value) {\n  const name = cleanWords(value);\n  if (!name || isGenericContactText(name)) return false;\n  const lower = name.toLowerCase();\n  if (lower.includes('smurfit') || lower.includes('westrock')) return false;\n  if (/\\b(inc|llc|ltd|corp|corporation|company|group|packaging|display|displays|contact|support|service|sales|marketing|team|office|department)\\b/i.test(name)) return false;\n  const parts = name.split(' ').filter(Boolean);\n  if (parts.length < 2 || parts.length > 3) return false;\n  return parts.every((part) => /^[A-Z][a-zA-Z'.-]{1,}$/.test(part));\n}\nfunction cleanTitle(value) {\n  const title = cleanWords(value);\n  if (!title || isGenericContactText(title)) return null;\n  if (/\\b(support|customer service|sales|marketing|team|office|department|contact us|help|info|general inquiry)\\b/i.test(title)) return null;\n  return title;\n}\nconst emails = unique(data.extracted_emails || []);\nconst phones = unique(data.extracted_phones || []);\nconst contactReason = cleanCode(data.contact_page_block_reason);\nconst homepageReason = cleanCode(data.homepage_block_reason);\nconst errors = cleanErrors([...(data.errors || []), homepageReason, contactReason]);\nconst qualifiedName = isLikelyPersonalName(data.contact_name_candidate) && data.contact_person_confidence === 'high' ? cleanWords(data.contact_name_candidate) : null;\nconst qualifiedTitle = qualifiedName ? cleanTitle(data.contact_title_candidate) : null;\nconst rawEnrichment = {\n  version: 'v0.1',\n  processed_at: now,\n  homepage_url: data.homepage_url || data.website || null,\n  contact_page_url: data.contact_page_url_candidate || null,\n  homepage_accessible: data.homepage_accessible === true,\n  homepage_http_status: data.homepage_http_status || null,\n  homepage_block_reason: homepageReason,\n  contact_page_accessible: data.contact_page_accessible === undefined ? null : data.contact_page_accessible,\n  contact_page_http_status: data.contact_page_http_status || null,\n  contact_page_block_reason: contactReason,\n  extracted_emails: emails,\n  extracted_phones: phones,\n  errors,\n};\nreturn { json: { ...data, homepage_html: undefined, contact_page_html: undefined, homepage_response_body: undefined, contact_response_body: undefined, homepage_phone_candidates_review: undefined, contact_phone_candidates_review: undefined, contact_person_candidate_review: undefined, contact_page_candidates_considered: undefined, headers: undefined, 'set-cookie': undefined, cookies: undefined, error: undefined, errors, extracted_emails: emails, extracted_phones: phones, next_company_description: nonEmpty(data.company_description) ? null : (data.company_description_candidate || null), next_contact_page_url: nonEmpty(data.contact_page_url) ? null : (data.contact_page_url_candidate || null), next_email: nonEmpty(data.email) ? null : first(emails), next_phone: nonEmpty(data.phone) ? null : first(phones), next_contact_name: nonEmpty(data.contact_name) ? null : qualifiedName, next_contact_title: nonEmpty(data.contact_title) ? null : qualifiedTitle, raw_data_enrichment_v01: rawEnrichment } };"
+      },
+      "id": "c70fc294-3719-41c4-a5ca-d8207e450354",
+      "name": "Merge And Clean Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        208
+      ],
+      "notesInFlow": true,
+      "notes": "Only allows contact_name/contact_title when a high-confidence personal name exists and title is paired with that name. Generic standalone titles are forced to null."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const data = item.json;\nconst allowed = ['blocked_by_cloudflare_403', 'access_denied_403', 'unauthorized_401', 'rate_limited_429', 'server_error_5xx', 'login_required', 'request_failed', 'invalid_website', 'no_website', 'no_contact_page'];\nfunction cleanCode(value) {\n  const text = String(value || '').toLowerCase();\n  return allowed.includes(text) ? text : null;\n}\nfunction cleanErrors(values) {\n  const result = [];\n  for (const value of values || []) {\n    const code = cleanCode(value);\n    if (code && !result.includes(code)) result.push(code);\n  }\n  return result;\n}\nconst hasWebsite = Boolean(data.website);\nconst hasValidWebsite = data.is_valid_website === true;\nconst homepageAccessible = data.homepage_accessible === true;\nconst hasNewInfo = [data.next_company_description, data.next_contact_page_url, data.next_email, data.next_phone, data.next_contact_name, data.next_contact_title].some((value) => value !== null && value !== undefined && String(value).trim() !== '');\nlet status;\nlet errorCode = null;\nif (!hasWebsite) {\n  status = 'skipped';\n  errorCode = 'no_website';\n} else if (!hasValidWebsite) {\n  status = 'failed';\n  errorCode = 'invalid_website';\n} else if (!homepageAccessible) {\n  status = 'failed';\n  errorCode = cleanCode(data.homepage_block_reason) || 'request_failed';\n} else if (data.contact_page_accessible === false && hasNewInfo) {\n  status = 'partial';\n  errorCode = cleanCode(data.contact_page_block_reason);\n} else if (hasNewInfo) {\n  status = 'succeeded';\n} else {\n  status = 'partial';\n}\nconst errors = cleanErrors([...(data.errors || []), errorCode]);\nreturn { json: { ...data, errors, enrichment_status_next: status, enrichment_error_next: errorCode } };"
+      },
+      "id": "79488e78-525f-4b21-b55b-0c7b93722977",
+      "name": "Decide Enrichment Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        208
+      ],
+      "notesInFlow": true,
+      "notes": "Chooses status and sanitized enrichment_error using only the allowed error code list."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const data = item.json;\nconst allowed = ['blocked_by_cloudflare_403', 'access_denied_403', 'unauthorized_401', 'rate_limited_429', 'server_error_5xx', 'login_required', 'request_failed', 'invalid_website', 'no_website', 'no_contact_page'];\nfunction cleanCode(value) { const text = String(value || '').toLowerCase(); return allowed.includes(text) ? text : null; }\nfunction cleanErrors(values) { const result = []; for (const value of values || []) { const code = cleanCode(value); if (code && !result.includes(code)) result.push(code); } return result; }\nfunction cleanWords(value) { return String(value || '').replace(/[^A-Za-z\\s'.-]/g, ' ').replace(/\\s+/g, ' ').trim(); }\nfunction isGenericContactText(value) { const text = cleanWords(value).toLowerCase(); const generic = ['support', 'customer service', 'sales', 'marketing', 'team', 'office', 'department', 'contact us', 'help', 'info', 'general inquiry', 'general enquiries', 'inquiry', 'enquiry', 'service', 'customer support']; return !text || generic.includes(text); }\nfunction isLikelyPersonalName(value) { const name = cleanWords(value); if (!name || isGenericContactText(name)) return false; const lower = name.toLowerCase(); if (lower.includes('smurfit') || lower.includes('westrock')) return false; if (/\\b(inc|llc|ltd|corp|corporation|company|group|packaging|display|displays|contact|support|service|sales|marketing|team|office|department)\\b/i.test(name)) return false; const parts = name.split(' ').filter(Boolean); if (parts.length < 2 || parts.length > 3) return false; return parts.every((part) => /^[A-Z][a-zA-Z'.-]{1,}$/.test(part)); }\nfunction cleanTitle(value) { const title = cleanWords(value); if (!title || isGenericContactText(title)) return null; if (/\\b(support|customer service|sales|marketing|team|office|department|contact us|help|info|general inquiry)\\b/i.test(title)) return null; return title; }\nconst raw = data.raw_data_enrichment_v01 || {};\nconst safeRaw = {\n  version: 'v0.1',\n  processed_at: raw.processed_at || new Date().toISOString(),\n  homepage_url: raw.homepage_url || data.homepage_url || data.website || null,\n  contact_page_url: raw.contact_page_url || data.contact_page_url_candidate || null,\n  homepage_accessible: raw.homepage_accessible === true,\n  homepage_http_status: raw.homepage_http_status || null,\n  homepage_block_reason: cleanCode(raw.homepage_block_reason || data.homepage_block_reason),\n  contact_page_accessible: raw.contact_page_accessible === undefined ? null : raw.contact_page_accessible,\n  contact_page_http_status: raw.contact_page_http_status || null,\n  contact_page_block_reason: cleanCode(raw.contact_page_block_reason || data.contact_page_block_reason),\n  extracted_emails: Array.isArray(raw.extracted_emails) ? raw.extracted_emails : [],\n  extracted_phones: Array.isArray(raw.extracted_phones) ? raw.extracted_phones : [],\n  errors: cleanErrors(raw.errors || data.errors || []),\n};\nconst safeError = cleanCode(data.enrichment_error_next);\nconst safeContactName = isLikelyPersonalName(data.next_contact_name) ? cleanWords(data.next_contact_name) : null;\nconst safeContactTitle = safeContactName ? cleanTitle(data.next_contact_title) : null;\nreturn { json: { ...data, homepage_html: undefined, contact_page_html: undefined, homepage_response_body: undefined, contact_response_body: undefined, homepage_phone_candidates_review: undefined, contact_phone_candidates_review: undefined, contact_person_candidate_review: undefined, contact_page_candidates_considered: undefined, headers: undefined, 'set-cookie': undefined, cookies: undefined, error: undefined, raw_data_enrichment_v01: safeRaw, enrichment_error_next: safeError, next_contact_name: safeContactName, next_contact_title: safeContactTitle, query_parameters: [data.lead_id, data.next_company_description, data.next_contact_page_url, data.next_email, data.next_phone, safeContactName, safeContactTitle, JSON.stringify(safeRaw), data.enrichment_status_next, safeError] } };"
+      },
+      "id": "3373a92b-9804-4b0d-a84b-4cb332f55c49",
+      "name": "Prepare Safe Lead Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        208
+      ],
+      "notesInFlow": true,
+      "notes": "Final guard before SQL parameters: contact_name and contact_title are sanitized again; standalone generic titles such as support cannot enter query_parameters."
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE public.leads\nSET\n  company_description = COALESCE(NULLIF(company_description, ''), NULLIF($2, '')),\n  contact_page_url = COALESCE(NULLIF(contact_page_url, ''), NULLIF($3, '')),\n  email = COALESCE(NULLIF(email, ''), NULLIF($4, '')),\n  phone = COALESCE(NULLIF(phone, ''), NULLIF($5, '')),\n  contact_name = COALESCE(NULLIF(contact_name, ''), NULLIF($6, '')),\n  contact_title = COALESCE(NULLIF(contact_title, ''), NULLIF($7, '')),\n  raw_data = jsonb_set(COALESCE(raw_data, '{}'::jsonb), '{enrichment_v01}', $8::jsonb, true),\n  enrichment_status = $9,\n  enriched_at = NOW(),\n  enrichment_error = NULLIF($10, '')\nWHERE id = $1::uuid\nRETURNING\n  id,\n  company_name,\n  website,\n  email,\n  phone,\n  contact_name,\n  contact_title,\n  score,\n  grade,\n  priority,\n  enrichment_status,\n  enriched_at,\n  enrichment_error;",
+        "options": {
+          "queryReplacement": "={{ $json.query_parameters }}"
+        }
+      },
+      "id": "9901d4c0-f72d-4f90-abee-34d9fa340ea0",
+      "name": "Update Lead Safely",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1680,
+        208
+      ],
+      "notesInFlow": true,
+      "notes": "??? UPDATE?? WHERE id = $1 ???? public.leads????????????? Trigger ????????"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  id,\n  company_name,\n  website,\n  email,\n  phone,\n  contact_name,\n  contact_title,\n  score,\n  grade,\n  priority,\n  enrichment_status,\n  enriched_at,\n  enrichment_error\nFROM public.leads\nWHERE id = $1::uuid\nLIMIT 1;",
+        "options": {
+          "queryReplacement": "={{ [$json.id] }}"
+        }
+      },
+      "id": "b6951534-caae-40ef-bab9-a610d84bf6e8",
+      "name": "Fetch Updated Lead",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1920,
+        208
+      ],
+      "notesInFlow": true,
+      "notes": "????????? public.leads????????"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const row = item.json;\nreturn {\n  json: {\n    review_summary: {\n      lead_id: row.id,\n      company_name: row.company_name,\n      website: row.website,\n      enrichment_status: row.enrichment_status,\n      enriched_at: row.enriched_at,\n      enrichment_error: row.enrichment_error,\n      email: row.email,\n      phone: row.phone,\n      contact_name: row.contact_name,\n      contact_title: row.contact_title,\n      score: row.score,\n      grade: row.grade,\n      priority: row.priority,\n      manual_review_required: true,\n      safety_note: 'Manual review required. No automatic outreach.'\n    }\n  }\n};"
+      },
+      "id": "fed65c36-109f-48d9-8dd0-3a566c6d1768",
+      "name": "Show Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        208
+      ],
+      "notesInFlow": true,
+      "notes": "ASCII-only manual review summary text."
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Test Lead UUID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Test Lead UUID": {
+      "main": [
+        [
+          {
+            "node": "Fetch One Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch One Lead": {
+      "main": [
+        [
+          {
+            "node": "Validate Website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Website": {
+      "main": [
+        [
+          {
+            "node": "IF Valid Website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Valid Website": {
+      "main": [
+        [
+          {
+            "node": "Prepare Running Update",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Failed Update Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Running Update": {
+      "main": [
+        [
+          {
+            "node": "Fetch Homepage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Failed Update Data": {
+      "main": [
+        [
+          {
+            "node": "Decide Enrichment Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Homepage": {
+      "main": [
+        [
+          {
+            "node": "Detect Homepage Access Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Homepage Signals": {
+      "main": [
+        [
+          {
+            "node": "Find Same-Domain Contact Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Same-Domain Contact Page": {
+      "main": [
+        [
+          {
+            "node": "IF Contact Page Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Contact Page Found": {
+      "main": [
+        [
+          {
+            "node": "Fetch Contact Page",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge And Clean Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Contact Page": {
+      "main": [
+        [
+          {
+            "node": "Detect Contact Page Access Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Contact Signals": {
+      "main": [
+        [
+          {
+            "node": "Merge And Clean Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge And Clean Result": {
+      "main": [
+        [
+          {
+            "node": "Decide Enrichment Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decide Enrichment Status": {
+      "main": [
+        [
+          {
+            "node": "Prepare Safe Lead Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Safe Lead Update": {
+      "main": [
+        [
+          {
+            "node": "Update Lead Safely",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Lead Safely": {
+      "main": [
+        [
+          {
+            "node": "Fetch Updated Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Updated Lead": {
+      "main": [
+        [
+          {
+            "node": "Show Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Homepage Access Result": {
+      "main": [
+        [
+          {
+            "node": "IF Homepage Accessible",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Homepage Accessible": {
+      "main": [
+        [
+          {
+            "node": "Extract Homepage Signals",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Homepage Blocked Update Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Homepage Blocked Update Data": {
+      "main": [
+        [
+          {
+            "node": "Decide Enrichment Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Contact Page Access Result": {
+      "main": [
+        [
+          {
+            "node": "IF Contact Page Accessible",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Contact Page Accessible": {
+      "main": [
+        [
+          {
+            "node": "Extract Contact Signals",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge And Clean Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "8be15be5-9685-411f-9405-56178ee692a1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe37a1f2a27ed7148ad1ceb412c05d0ce3464d75b08a617d89b704abe233b27e"
+  },
+  "nodeGroups": [],
+  "id": "bGdVrn4HVzQ2ER5U",
+  "tags": []
+}
