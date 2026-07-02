@@ -1,0 +1,30 @@
+{
+  "scripts": {
+    "dev": "tsx apps/api-server/demo.ts",
+    "demo:replay": "tsx apps/api-server/replay-demo.ts",
+    "test:orchestration": "tsx apps/api-server/replay-tests.ts",
+    "demo:scoring": "tsx scoring-engine/src/example.ts",
+    "test:scoring": "tsx scoring-engine/src/test-cases.ts",
+    "demo:trace": "tsx scoring-engine/src/trace-example.ts",
+    "demo:orchestration-scoring": "tsx apps/api-server/orchestration-scoring-demo.ts",
+    "test:orchestration-scoring": "tsx apps/api-server/orchestration-scoring-tests.ts",
+    "phase1:demo": "tsx apps/api-server/phase1-demo.ts",
+    "phase1:test": "tsx apps/api-server/phase1-tests.ts",
+    "phase2:demo": "tsx apps/api-server/phase2-demo.ts",
+    "phase2:test": "tsx apps/api-server/phase2-tests.ts",
+    "phase2:server": "tsx apps/api-server/phase2-http-server.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@types/node": "^24.0.8",
+    "jest": "^30.0.3",
+    "ts-jest": "^29.4.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "uuid": "^11.1.0",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.3"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "version": "v1",
+  "metadata": {
+    "name": "AI FT-OPC Lead Scoring v0.2-alpha",
+    "description": "Config-driven rule set for local Lead Scoring Engine validation.",
+    "created_at": "2026-07-01"
+  },
+  "weights": {
+    "relevance": 0.5,
+    "trust": 0.2,
+    "capability": 0.3,
+    "risk": 0.2
+  },
+  "rules": [
+    {
+      "id": "keyword-display",
+      "rule_type": "keyword",
+      "operator": "contains",
+      "field": "industry_keywords",
+      "value": "display",
+      "dimension": "relevance",
+      "score_delta": 20
+    },
+    {
+      "id": "country-target-markets",
+      "rule_type": "country",
+      "operator": "in",
+      "field": "country",
+      "value": ["US", "UK", "DE"],
+      "dimension": "relevance",
+      "score_delta": 10
+    },
+    {
+      "id": "contact-email-exists",
+      "rule_type": "contact",
+      "operator": "exists",
+      "field": "has_email",
+      "dimension": "trust",
+      "score_delta": 15
+    },
+    {
+      "id": "signal-factory",
+      "rule_type": "signal",
+      "operator": "contains",
+      "field": "signals",
+      "value": "factory",
+      "dimension": "capability",
+      "score_delta": 10
+    },
+    {
+      "id": "risk-wordpress",
+      "rule_type": "risk",
+      "operator": "contains",
+      "field": "website",
+      "value": "wordpress",
+      "dimension": "risk",
+      "score_delta": -10
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "moduleDetection": "force",
+    "esModuleInterop": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "types": [
+      "node"
+    ]
+  },
+  "ts-node": {
+    "esm": false
+  },
+  "include": [
+    "packages/**/*.ts",
+    "apps/**/*.ts",
+    "scoring-engine/**/*.ts"
+  ]
+}

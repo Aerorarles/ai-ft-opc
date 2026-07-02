@@ -1,0 +1,52 @@
+{
+  "version": "v1-invalid",
+  "metadata": {
+    "name": "Invalid Lead Scoring Config",
+    "description": "Intentionally invalid config for local validation tests.",
+    "created_at": "2026-07-01"
+  },
+  "weights": {
+    "relevance": 0.5,
+    "trust": -0.2,
+    "capability": 0.3,
+    "risk": 0.2
+  },
+  "rules": [
+    {
+      "id": "duplicate-rule",
+      "rule_type": "keyword",
+      "operator": "contains",
+      "field": "industry_keywords",
+      "value": "display",
+      "dimension": "relevance",
+      "score_delta": 20
+    },
+    {
+      "id": "duplicate-rule",
+      "rule_type": "country",
+      "operator": "in",
+      "field": "country",
+      "value": "US",
+      "dimension": "relevance",
+      "score_delta": 10
+    },
+    {
+      "id": "bad-operator",
+      "rule_type": "signal",
+      "operator": "starts_with",
+      "field": "signals",
+      "value": "factory",
+      "dimension": "capability",
+      "score_delta": 10
+    },
+    {
+      "id": "unknown-field",
+      "rule_type": "risk",
+      "operator": "contains",
+      "field": "secret_source",
+      "value": "wordpress",
+      "dimension": "risk",
+      "score_delta": -10
+    }
+  ]
+}

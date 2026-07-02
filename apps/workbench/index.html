@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI FT-OPC Phase 2 Workbench</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>AI FT-OPC Lead Workbench</h1>
+        <p>LOCAL MVP / NOT CONNECTED TO PRODUCTION</p>
+      </div>
+      <button id="refreshButton" type="button">Refresh</button>
+    </header>
+
+    <main class="layout">
+      <section class="panel">
+        <div class="panel-title">
+          <h2>Lead Inbox</h2>
+          <span id="leadCount">0 leads</span>
+        </div>
+        <div id="leadList" class="list"></div>
+      </section>
+
+      <section class="panel detail-panel">
+        <div class="panel-title">
+          <h2>Lead Detail</h2>
+          <button id="previewButton" type="button" disabled>Preview Shadow</button>
+        </div>
+        <div id="leadDetail" class="detail-empty">Select a lead.</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">
+          <h2>Review Queue</h2>
+          <span id="queueCount">0 items</span>
+        </div>
+        <div id="queueList" class="list"></div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
