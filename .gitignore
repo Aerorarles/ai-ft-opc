@@ -3,6 +3,17 @@ data/
 logs/
 *.log
 .env
+.env.*
+*.env
 node_modules/
 dist/
 build/
+*.pem
+*.key
+*.p12
+*.pfx
+coverage/
+.DS_Store
+workflows/n8n/*.json
+!workflows/n8n/drafts/
+!workflows/n8n/drafts/*.json
