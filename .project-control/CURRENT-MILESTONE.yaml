@@ -10,4 +10,5 @@ milestone:
   notes:
     - M0 baseline consolidation is completed and retained as project history.
     - M1 Production Data Foundation has not started.
-    - M0.5-WP02 is explicitly approved for restricted work-branch Git automation only.
+    - M0.5-WP02 passed after PR #1 was merged to main by the user.
+    - M0.5-WP03 GitHub Actions CI is in progress on a dedicated work branch.

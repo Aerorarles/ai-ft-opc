@@ -1,8 +1,8 @@
 # AI FT-OPC Current Status
 
-版本：M0.5-WP02 v1.0
+版本：M0.5-WP03 v1.0
 日期：2026-07-11
-状态：CURRENT CONTROL STATE — BLOCKED
+状态：CURRENT CONTROL STATE — IN_PROGRESS
 适用范围：项目当前事实入口
 禁止事项：本状态文件不授权数据库、n8n、Docker、服务器、Git 写操作或真实外联。
 
@@ -12,18 +12,19 @@ M0.5 — Autonomous Delivery Foundation
 
 ## Current Work Package
 
-M0.5-WP02 — Restricted Git Automation (BLOCKED)
+M0.5-WP03 — GitHub Actions CI
 
 ## Overall State
 
-M0 已完成基线冻结。M0.5-WP01 已通过并建立控制面。M0.5-WP02 已完成专用工作分支、精确暂存、普通提交和远程工作分支推送，但因当前环境缺少 GitHub CLI 而阻塞在 PR 创建；M1 Production Data Foundation 尚未开始。
+M0 已完成基线冻结。M0.5-WP01 已通过并建立控制面。M0.5-WP02 的 PR #1 已由用户合并到 main。M0.5-WP03 正在建立 GitHub Actions PR 自动验证；M1 Production Data Foundation 尚未开始。
 
 ## Recently Completed
 
 - 最新 master architecture v1.0 已在本地工作树中确认。
 - Current System Inventory、Interface Map、Commercial v1.0 Gap Register、M1 Plan 与 M0 progress report 已建立。
 - 本地 typecheck、Phase 1/2、scoring、orchestration 与 orchestration-scoring 测试通过。
-- M0.5-WP01 Project Control Plane 已通过；M0.5-WP02 工作分支已推送，PR 创建等待手工 GitHub UI 或获批的 PR 创建能力。
+- M0.5-WP01 Project Control Plane 已通过；M0.5-WP02 受限 Git 分支/PR 交付已完成并由用户合并。
+- M0.5-WP03 正在配置 typecheck、Phase 1/2、scoring 与 orchestration 的 PR CI。
 
 ## Current Baseline
 
@@ -40,7 +41,7 @@ M0 已完成基线冻结。M0.5-WP01 已通过并建立控制面。M0.5-WP02 已
 
 ## Pending Approvals
 
-- M0.5-WP02 PR 创建：本机未安装 GitHub CLI；禁止读取 token 或使用未批准的 API 路径。
+- M0.5-WP03 需要在新 PR 中确认 GitHub Actions workflow 实际触发与检查结果；本机仍无 GitHub CLI，不读取 token 或使用未批准 API。
 - 任一 M1 Work Package 的明确范围。
 - 数据库 schema/migration 草案评审与未来执行授权。
 - 真实单条 shadow 写入、n8n inactive 导入/验证、HTTP server 启动或真实数据接入。
@@ -51,7 +52,7 @@ M0 已完成基线冻结。M0.5-WP01 已通过并建立控制面。M0.5-WP02 已
 
 ## Next Work Package
 
-先通过手工 GitHub UI 创建该工作分支的 PR，或提供已批准的 GitHub PR 创建能力；PR 建立后再恢复 M0.5-WP02 并评估 WP03。M1 仍以 M1-WP01 Production Persistence Contract 为后续数据基础入口。
+完成 M0.5-WP03 的工作分支推送、PR 创建和 GitHub Actions 检查后，可按状态机继续 M0.5-WP04 Codex Continuation Protocol。M1 仍以 M1-WP01 Production Persistence Contract 为后续数据基础入口。
 
 ## 验收标准
 

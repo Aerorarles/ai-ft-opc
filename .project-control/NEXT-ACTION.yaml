@@ -1,13 +1,12 @@
 next_action:
-  type: STOP
-  target: M0.5-WP02
-  reason: Work branch push succeeded, but PR creation is blocked because GitHub CLI is unavailable and no secret-based API access is permitted.
-  required_actor: user
-  blocking: true
+  type: EXECUTE_WORK_PACKAGE
+  target: M0.5-WP03
+  reason: PR #1 was merged to main by the user; M0.5-WP03 may now establish PR validation CI on a dedicated work branch.
+  required_actor: Codex
+  blocking: false
   updated_at: "2026-07-11"
   prohibited_until_approved:
     - production_database_write
     - migration_execution
     - production_n8n_activation
     - real_outreach
-    - M0.5-WP03_execution_until_WP02_PR_exists

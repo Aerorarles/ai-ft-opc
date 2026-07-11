@@ -395,6 +395,8 @@ M1 的低风险本地开发可以进入持续执行模式。
 ```text
 M0 Architecture Freeze          PASSED / BASELINE COMPLETE
 M0.5 Autonomous Delivery        IN_PROGRESS
-M0.5-WP01 Project Control Plane READY
+M0.5-WP01 Project Control Plane PASSED
+M0.5-WP02 Restricted Git Automation PASSED
+M0.5-WP03 GitHub Actions CI IN_PROGRESS
 M1 Production Data Foundation   NOT_STARTED
 ```
