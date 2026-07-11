@@ -1,8 +1,8 @@
 next_action:
-  type: STOP
-  target: M0.5-WP02
-  reason: Work branch push succeeded, but PR creation is blocked because GitHub CLI is unavailable and no secret-based API access is permitted.
-  required_actor: user
+  type: WAIT_FOR_REVIEW
+  target: M0.5
+  reason: M0.5-WP01 through M0.5-WP06 are complete; PR #2 CI passed and the milestone is ready for human review and the separately approved main branch merge gate.
+  required_actor: ChatGPT_and_user
   blocking: true
   updated_at: "2026-07-11"
   prohibited_until_approved:
@@ -10,4 +10,5 @@ next_action:
     - migration_execution
     - production_n8n_activation
     - real_outreach
-    - M0.5-WP03_execution_until_WP02_PR_exists
+    - main_branch_merge_without_explicit_approval
+    - M1_execution_without_explicit_user_approval

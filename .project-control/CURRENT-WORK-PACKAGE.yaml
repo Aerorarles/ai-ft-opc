@@ -1,33 +1,53 @@
 work_package:
-  id: M0.5-WP02
-  name: Restricted Git Automation
-  status: BLOCKED
+  id: M0.5-WP06
+  name: Progress & Approval Reporting
+  status: PASSED
   started_at: "2026-07-11"
   allowed_scope:
-    - create_dedicated_work_branch
-    - exact_file_stage
-    - ordinary_commit
-    - push_dedicated_work_branch
-    - create_pull_request
-    - read_git_status_log_remote_and_pr_ci_state
+    - create_progress_reports
+    - create_approval_templates
     - update_project_control_status_and_progress
+    - run_local_read_only_control_validation
   forbidden_scope:
+    - production_access
+    - database_or_migration_change
+    - n8n_or_docker_or_server_change
     - direct_push_main
     - force_push
     - automatic_merge
     - protected_branch_deletion
     - shared_branch_rebase
     - remote_history_reset
-    - broad_stage_commands
-    - conflict_self_resolution
   predecessor:
-    id: M0.5-WP01
-    name: Project Control Plane
+    id: M0.5-WP05
+    name: Automated Continuation Entry Point
     status: PASSED
-  next_work_package: M0.5-WP03
-  next_work_package_name: GitHub Actions CI
-  next_work_package_requires_explicit_user_approval: false
-  blocker:
-    code: github_pr_creation_tool_unavailable
-    detail: Dedicated branch was pushed successfully, but GitHub CLI is not installed and no credential-based API path may be used.
-    required_resolution: Create the PR manually from the remote branch URL or provide an approved GitHub PR creation capability.
+    evidence: Read-only project-control entry scripts pass local validation.
+  completed_work_packages:
+    - id: M0.5-WP01
+      status: PASSED
+    - id: M0.5-WP02
+      status: PASSED
+      evidence: PR #1 merged by the user.
+    - id: M0.5-WP03
+      status: PASSED
+      evidence: PR #2 GitHub Actions Local Runtime Validation passed.
+    - id: M0.5-WP04
+      status: PASSED
+      evidence: Continuation protocol documented and cross-referenced.
+    - id: M0.5-WP05
+      status: PASSED
+      evidence: Read-only entry scripts pass local validation.
+    - id: M0.5-WP06
+      status: PASSED
+      evidence: Progress and approval reporting is present and current.
+  next_work_package: M1-WP01
+  next_work_package_name: Production Persistence Contract
+  next_work_package_requires_explicit_user_approval: true
+  milestone_gate:
+    status: READY_FOR_REVIEW
+    pull_request:
+      number: 2
+      url: https://github.com/Aerorarles/ai-ft-opc/pull/2
+      ci_status: PASSED
+    required_action: Human review and explicit approval before merging PR #2 into main.

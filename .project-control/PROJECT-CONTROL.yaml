@@ -26,3 +26,9 @@ state_files:
   execution_policy: .project-control/EXECUTION-POLICY.yaml
   approval_gates: .project-control/APPROVAL-GATES.yaml
   git_automation_policy: .project-control/GIT-AUTOMATION-POLICY.yaml
+  continuation_protocol: .project-control/CONTINUATION-PROTOCOL.md
+
+entry_points:
+  validate_project_control: scripts/project-control/validate-project-control.js
+  show_next_action: scripts/project-control/show-next-action.js
+  validate_safe_state: scripts/project-control/validate-safe-state.js

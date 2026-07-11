@@ -1,0 +1,46 @@
+name: AI FT-OPC Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Local Runtime Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Phase 1 tests
+        run: npm run phase1:test
+
+      - name: Phase 2 tests
+        run: npm run phase2:test
+
+      - name: Scoring tests
+        run: npm run test:scoring
+
+      - name: Orchestration tests
+        run: npm run test:orchestration
+
+      - name: Orchestration scoring tests
+        run: npm run test:orchestration-scoring

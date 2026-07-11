@@ -1,6 +1,6 @@
 git_automation:
   policy_version: "1.0"
-  status: USER_APPROVED_FOR_M0_5_WP02
+  status: USER_APPROVED_FOR_LOW_RISK_M0_5_WORK_PACKAGES
   approved_scope:
     - create_dedicated_work_branch
     - exact_file_stage_for_current_work_package
@@ -34,5 +34,5 @@ git_automation:
     - unexpected_staged_file
     - secret_or_credential_risk
     - scope_expansion_required
-  current_branch: codex/m0-5-wp02-restricted-git-automation
-  current_work_package: M0.5-WP02
+  current_branch: codex/m0-5-wp03-github-actions-ci
+  current_work_package: M0.5-WP06
