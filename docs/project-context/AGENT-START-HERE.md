@@ -11,15 +11,15 @@
 
 ## 2. 当前项目状态
 
-- 当前 Milestone：M0.5 — Autonomous Delivery Foundation（READY_FOR_GATE）。
-- 当前 Work Package：M0.5-WP06 — Progress & Approval Reporting（PASSED）。
+- 当前 Milestone：M1 — Production Data Foundation（IN_PROGRESS）。
+- 当前 Work Package：M1-WP01 — Production Persistence Contract（READY_FOR_REVIEW）。
 - 已确认资产：Lead Agent v0.1 生产事实、Lead Enrichment v0.1.7 已封存事实、Phase 1 + Phase 2 本地 MVP、v0.2-v0.7 scoring engine、本地 orchestration runtime、Phase 3 安全架构设计。
 - 当前允许：受限本地文档与项目控制面工作、已批准范围内的本地代码/测试工作、后续经批准的 M1 设计与草案准备。
 - 未经批准不得做：数据库 migration 或写入、Docker/服务器操作、n8n 发布或激活、批量 Enrichment、真实客户触达、Git 写操作、付费数据源真实查询。
 
 ## 3. 当前最高优先级
 
-M0.5 Gate Review：WP01-WP06 均已完成，PR #2 的 GitHub Actions CI 已通过。下一动作是人工审查与单独批准的 main branch merge gate；不得自动 merge、force push、共享分支 rebase、远程历史重写或开始 M1。
+M1-WP01 Production Persistence Contract：PR #3 CI 已通过，等待第二层审查。已完成本地接口、脱敏、版本锚点和 DRAFT migration 对齐审查；不得连接数据库、执行 migration、修改 `public.leads` v0.1 评分字段、激活 n8n、操作服务器或开始 M1-WP02。
 
 ## 4. 核心架构
 

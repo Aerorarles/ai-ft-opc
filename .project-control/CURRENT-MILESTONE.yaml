@@ -1,16 +1,14 @@
 milestone:
-  id: M0.5
-  name: Autonomous Delivery Foundation
-  status: READY_FOR_GATE
+  id: M1
+  name: Production Data Foundation
+  status: IN_PROGRESS
   started_at: "2026-07-11"
-  previous_milestone: M0
-  next_milestone: M1
-  exit_gate: M0_5_PR_review_and_user_approved_main_branch_merge
-  scope: autonomous_delivery_foundation
+  previous_milestone: M0.5
+  next_milestone: M2
+  exit_gate: controlled_production_persistence_with_traceability_idempotency_and_v01_protection
+  scope: production_data_foundation_contracts_and_approved_implementation
   notes:
     - M0 baseline consolidation is completed and retained as project history.
-    - M1 Production Data Foundation has not started.
-    - M0.5-WP02 passed after PR #1 was merged to main by the user.
-    - M0.5-WP03 GitHub Actions CI passed on PR #2.
-    - M0.5-WP04, M0.5-WP05, and M0.5-WP06 are completed as local-safe control-plane work.
-    - M0.5 is ready for PR review and the separately approved main branch merge gate.
+    - M0.5 is passed after PR #2 was merged to main by the user.
+    - M1-WP01 Production Persistence Contract is explicitly approved and ready for review.
+    - M1 does not authorize database write, migration execution, n8n activation, server change, or real outreach.
