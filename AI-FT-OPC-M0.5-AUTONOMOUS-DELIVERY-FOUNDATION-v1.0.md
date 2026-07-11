@@ -397,6 +397,6 @@ M0 Architecture Freeze          PASSED / BASELINE COMPLETE
 M0.5 Autonomous Delivery        IN_PROGRESS
 M0.5-WP01 Project Control Plane PASSED
 M0.5-WP02 Restricted Git Automation PASSED
-M0.5-WP03 GitHub Actions CI BLOCKED — waiting for manual PR creation
+M0.5-WP03 GitHub Actions CI IN_PROGRESS — PR #2 open, awaiting CI checks
 M1 Production Data Foundation   NOT_STARTED
 ```

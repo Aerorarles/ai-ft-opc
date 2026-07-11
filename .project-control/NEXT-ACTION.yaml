@@ -1,13 +1,13 @@
 next_action:
-  type: STOP
+  type: RUN_TESTS
   target: M0.5-WP03
-  reason: CI branch push succeeded, but PR creation is blocked because GitHub CLI is unavailable and no secret-based API access is permitted.
-  required_actor: user
-  blocking: true
+  reason: PR #2 is open; wait for GitHub Actions validation to run and record the result before WP03 review.
+  required_actor: GitHub_Actions_then_Codex
+  blocking: false
   updated_at: "2026-07-11"
   prohibited_until_approved:
     - production_database_write
     - migration_execution
     - production_n8n_activation
     - real_outreach
-    - M0.5-WP04_execution_until_WP03_PR_exists
+    - M0.5-WP04_execution_until_WP03_CI_passes

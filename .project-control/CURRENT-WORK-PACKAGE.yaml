@@ -1,7 +1,7 @@
 work_package:
   id: M0.5-WP03
   name: GitHub Actions CI
-  status: BLOCKED
+  status: IN_PROGRESS
   started_at: "2026-07-11"
   allowed_scope:
     - create_minimal_pull_request_ci_workflow
@@ -32,7 +32,8 @@ work_package:
   next_work_package: M0.5-WP04
   next_work_package_name: Codex Continuation Protocol
   next_work_package_requires_explicit_user_approval: false
-  blocker:
-    code: github_pr_creation_tool_unavailable
-    detail: CI work branch was pushed successfully, but GitHub CLI is not installed and no credential-based API path may be used.
-    required_resolution: Create the PR manually from the remote branch URL or provide an approved GitHub PR creation capability.
+  pull_request:
+    number: 2
+    url: https://github.com/Aerorarles/ai-ft-opc/pull/2
+    status: OPEN
+  exit_gate: pull_request_ci_checks_pass_and_review_is_available
