@@ -1,0 +1,43 @@
+allowed:
+  - inspect_repository
+  - read_non_sensitive_files
+  - modify_allowed_local_files
+  - create_tests
+  - run_local_tests
+  - update_docs
+  - update_project_control
+  - create_dedicated_git_work_branch
+  - exact_file_stage
+  - ordinary_commit_on_dedicated_work_branch
+  - push_dedicated_work_branch
+  - create_pull_request
+
+requires_approval:
+  - production_database_write
+  - migration_execution
+  - server_change
+  - docker_change
+  - production_n8n_activation
+  - real_outreach
+  - paid_api_usage
+  - permission_expansion
+  - main_branch_merge
+
+forbidden:
+  - read_secrets
+  - expose_credentials
+  - force_push
+  - destructive_database_operation
+  - automatic_real_outreach
+  - unapproved_production_access
+
+defaults:
+  storage_mode: memory
+  shadow_writer_enabled: false
+  http_server_enabled: false
+  git_mode: restricted_work_branch
+  git_default_branch: main
+  git_direct_push_main: false
+  git_force_push: false
+  git_auto_merge: false
+  n8n_mode: inactive_design_only

@@ -1,0 +1,28 @@
+project:
+  id: ai-ft-opc
+  name: AI FT-OPC
+  control_plane_version: "1.0"
+
+authority:
+  master_architecture: docs/project-context/AI-FT-OPC-MASTER-ARCHITECTURE-COMMERCIAL-ROADMAP-v1.0-LATEST.md
+  current_status: docs/project-status/AI-FT-OPC-CURRENT-STATUS.md
+  precedence:
+    - user_explicit_instruction
+    - latest_master_architecture
+    - approved_specialized_design
+    - historical_project_document
+
+execution:
+  mode: semi_autonomous
+  default_risk_level: local_safe
+  human_in_control: true
+  production_access: false
+  external_side_effects: false
+
+state_files:
+  current_milestone: .project-control/CURRENT-MILESTONE.yaml
+  current_work_package: .project-control/CURRENT-WORK-PACKAGE.yaml
+  next_action: .project-control/NEXT-ACTION.yaml
+  execution_policy: .project-control/EXECUTION-POLICY.yaml
+  approval_gates: .project-control/APPROVAL-GATES.yaml
+  git_automation_policy: .project-control/GIT-AUTOMATION-POLICY.yaml

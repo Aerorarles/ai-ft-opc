@@ -1,0 +1,55 @@
+approval_gates:
+  - id: production_database_write
+    action: Write to production PostgreSQL business data.
+    risk: high
+    required_approver: owner
+    required_evidence: SQL or adapter contract, affected scope, precheck, test result, rollback plan.
+    rollback_required: true
+  - id: migration_execution
+    action: Execute an approved database migration.
+    risk: critical
+    required_approver: owner
+    required_evidence: reviewed migration, impact analysis, backup/precheck, rollback SQL, execution window.
+    rollback_required: true
+  - id: server_change
+    action: Change server, deployment, or service runtime configuration.
+    risk: high
+    required_approver: owner_or_admin
+    required_evidence: change plan, affected service, verification plan, rollback plan.
+    rollback_required: true
+  - id: docker_change
+    action: Change Docker or Docker Compose configuration.
+    risk: high
+    required_approver: owner_or_admin
+    required_evidence: diff review, service impact, data volume safety, rollback plan.
+    rollback_required: true
+  - id: production_n8n_activation
+    action: Publish or activate a production n8n workflow.
+    risk: high
+    required_approver: owner_and_reviewer
+    required_evidence: credential-free export review, inactive validation, bounded test, failure path, rollback procedure.
+    rollback_required: true
+  - id: real_outreach
+    action: Send email, WhatsApp, LinkedIn, form submission, quote, or other real customer outreach.
+    risk: critical
+    required_approver: sales_approver
+    required_evidence: approved target, channel, content version, batch limit, suppression check, time window.
+    rollback_required: false
+  - id: paid_api_usage
+    action: Query a paid external data or API provider.
+    risk: medium
+    required_approver: owner
+    required_evidence: provider, cost estimate, data scope, rate limit, retention boundary.
+    rollback_required: false
+  - id: permission_expansion
+    action: Expand agent, user, repository, or environment permissions.
+    risk: high
+    required_approver: owner_or_admin
+    required_evidence: least-privilege justification, affected identity, time limit, audit plan, revocation method.
+    rollback_required: true
+  - id: main_branch_merge
+    action: Merge changes into main branch.
+    risk: medium
+    required_approver: owner_or_reviewer
+    required_evidence: reviewed diff, passing local tests, scope confirmation, rollback or revert plan.
+    rollback_required: true

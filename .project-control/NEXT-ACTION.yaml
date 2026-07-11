@@ -1,0 +1,13 @@
+next_action:
+  type: STOP
+  target: M0.5-WP02
+  reason: Work branch push succeeded, but PR creation is blocked because GitHub CLI is unavailable and no secret-based API access is permitted.
+  required_actor: user
+  blocking: true
+  updated_at: "2026-07-11"
+  prohibited_until_approved:
+    - production_database_write
+    - migration_execution
+    - production_n8n_activation
+    - real_outreach
+    - M0.5-WP03_execution_until_WP02_PR_exists
