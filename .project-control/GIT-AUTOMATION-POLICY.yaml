@@ -35,4 +35,4 @@ git_automation:
     - secret_or_credential_risk
     - scope_expansion_required
   current_branch: codex/m0-5-wp03-github-actions-ci
-  current_work_package: M0.5-WP03
+  current_work_package: M0.5-WP06
