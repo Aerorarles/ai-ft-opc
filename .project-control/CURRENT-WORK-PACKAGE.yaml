@@ -1,7 +1,7 @@
 work_package:
   id: M0.5-WP02
   name: Restricted Git Automation
-  status: IN_PROGRESS
+  status: BLOCKED
   started_at: "2026-07-11"
   allowed_scope:
     - create_dedicated_work_branch
@@ -27,3 +27,7 @@ work_package:
   next_work_package: M0.5-WP03
   next_work_package_name: GitHub Actions CI
   next_work_package_requires_explicit_user_approval: false
+  blocker:
+    code: github_pr_creation_tool_unavailable
+    detail: Dedicated branch was pushed successfully, but GitHub CLI is not installed and no credential-based API path may be used.
+    required_resolution: Create the PR manually from the remote branch URL or provide an approved GitHub PR creation capability.

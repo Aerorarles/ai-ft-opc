@@ -1,12 +1,13 @@
 next_action:
-  type: ADVANCE_WORK_PACKAGE
+  type: STOP
   target: M0.5-WP02
-  reason: User explicitly approved restricted Git automation on a dedicated work branch; execution remains bounded by the Git automation policy.
-  required_actor: Codex
-  blocking: false
+  reason: Work branch push succeeded, but PR creation is blocked because GitHub CLI is unavailable and no secret-based API access is permitted.
+  required_actor: user
+  blocking: true
   updated_at: "2026-07-11"
   prohibited_until_approved:
     - production_database_write
     - migration_execution
     - production_n8n_activation
     - real_outreach
+    - M0.5-WP03_execution_until_WP02_PR_exists

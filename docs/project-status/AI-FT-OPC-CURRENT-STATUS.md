@@ -1,8 +1,8 @@
 # AI FT-OPC Current Status
 
-版本：M0-WP01 v1.0
+版本：M0.5-WP02 v1.0
 日期：2026-07-11
-状态：CURRENT BASELINE
+状态：CURRENT CONTROL STATE — BLOCKED
 适用范围：项目当前事实入口
 禁止事项：本状态文件不授权数据库、n8n、Docker、服务器、Git 写操作或真实外联。
 
@@ -12,18 +12,18 @@ M0.5 — Autonomous Delivery Foundation
 
 ## Current Work Package
 
-M0.5-WP02 — Restricted Git Automation
+M0.5-WP02 — Restricted Git Automation (BLOCKED)
 
 ## Overall State
 
-M0 已完成基线冻结。M0.5-WP01 已通过并建立控制面。M0.5-WP02 正在以用户批准的专用工作分支模型归档当前控制与基线文档；M1 Production Data Foundation 尚未开始。
+M0 已完成基线冻结。M0.5-WP01 已通过并建立控制面。M0.5-WP02 已完成专用工作分支、精确暂存、普通提交和远程工作分支推送，但因当前环境缺少 GitHub CLI 而阻塞在 PR 创建；M1 Production Data Foundation 尚未开始。
 
 ## Recently Completed
 
 - 最新 master architecture v1.0 已在本地工作树中确认。
 - Current System Inventory、Interface Map、Commercial v1.0 Gap Register、M1 Plan 与 M0 progress report 已建立。
 - 本地 typecheck、Phase 1/2、scoring、orchestration 与 orchestration-scoring 测试通过。
-- M0.5-WP01 Project Control Plane 已通过；M0.5-WP02 Restricted Git Automation 已获用户明确批准并开始。
+- M0.5-WP01 Project Control Plane 已通过；M0.5-WP02 工作分支已推送，PR 创建等待手工 GitHub UI 或获批的 PR 创建能力。
 
 ## Current Baseline
 
@@ -40,7 +40,7 @@ M0 已完成基线冻结。M0.5-WP01 已通过并建立控制面。M0.5-WP02 正
 
 ## Pending Approvals
 
-- M0.5-WP02 的分支、暂存区、PR 与 CI 验证；遇到 Git 冲突、远程分叉、权限异常或敏感文件风险必须停止。
+- M0.5-WP02 PR 创建：本机未安装 GitHub CLI；禁止读取 token 或使用未批准的 API 路径。
 - 任一 M1 Work Package 的明确范围。
 - 数据库 schema/migration 草案评审与未来执行授权。
 - 真实单条 shadow 写入、n8n inactive 导入/验证、HTTP server 启动或真实数据接入。
@@ -51,7 +51,7 @@ M0 已完成基线冻结。M0.5-WP01 已通过并建立控制面。M0.5-WP02 正
 
 ## Next Work Package
 
-完成 M0.5-WP02 后，在不涉及新的高风险权限扩张的前提下，可按 Project Control 状态机继续 M0.5-WP03 GitHub Actions CI；M1 仍以 M1-WP01 Production Persistence Contract 为后续数据基础入口。
+先通过手工 GitHub UI 创建该工作分支的 PR，或提供已批准的 GitHub PR 创建能力；PR 建立后再恢复 M0.5-WP02 并评估 WP03。M1 仍以 M1-WP01 Production Persistence Contract 为后续数据基础入口。
 
 ## 验收标准
 
