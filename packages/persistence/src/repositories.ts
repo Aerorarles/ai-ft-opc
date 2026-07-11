@@ -30,4 +30,16 @@
  * }} ReviewRepository
  */
 
+/**
+ * @typedef {{
+ *   createIntakeRun(run: import("./types.ts").IntakeRun): Promise<import("./types.ts").IntakeRun>,
+ *   getIntakeRun(runId: string): Promise<import("./types.ts").IntakeRun | null>,
+ *   getIntakeRunByIdempotencyKey(tenantId: string, idempotencyKey: string): Promise<import("./types.ts").IntakeRun | null>,
+ *   completeIntakeRun(runId: string, patch: Pick<import("./types.ts").IntakeRun, "source_item_count" | "candidate_count" | "run_status" | "completed_at">): Promise<import("./types.ts").IntakeRun>,
+ *   createSourceItem(item: import("./types.ts").IntakeSourceItem): Promise<import("./types.ts").IntakeSourceItem>,
+ *   createCandidate(candidate: import("./types.ts").IntakeCandidateRecord): Promise<import("./types.ts").IntakeCandidateRecord>,
+ *   listCandidatesByRun(runId: string): Promise<import("./types.ts").IntakeCandidateRecord[]>
+ * }} IntakeRepository
+ */
+
 module.exports = {};

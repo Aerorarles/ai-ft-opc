@@ -1,13 +1,13 @@
 work_package:
-  id: M1-WP01
-  name: Production Persistence Contract
+  id: M1-WP02
+  name: Intake Persistence
   status: READY_FOR_REVIEW
   started_at: "2026-07-11"
   allowed_scope:
-    - inspect_non_sensitive_persistence_interfaces
-    - define_local_typescript_contract
-    - create_data_model_and_migration_review_docs
-    - create_local_contract_tests
+    - create_local_intake_run_source_item_candidate_contracts
+    - create_memory_intake_repository
+    - create_local_intake_tests
+    - create_intake_design_and_review_docs
     - update_project_control_status_and_progress
   forbidden_scope:
     - database_connection
@@ -21,16 +21,12 @@ work_package:
     - force_push
     - automatic_merge
   predecessor:
-    id: M0.5-WP06
-    name: Progress & Approval Reporting
+    id: M1-WP01
+    name: Production Persistence Contract
     status: PASSED
-    evidence: M0.5 PR #2 merged by the user.
-  next_work_package: M1-WP02
-  next_work_package_name: Intake Persistence
+    evidence: PR #3 merged by the user.
+  next_work_package: M1-WP03
+  next_work_package_name: Shadow Scoring Persistence
   next_work_package_requires_explicit_user_approval: true
   review_gate:
-    pull_request:
-      number: 3
-      url: https://github.com/Aerorarles/ai-ft-opc/pull/3
-      ci_status: PASSED
-    required_action: GitHub Actions CI, ChatGPT second-layer review, and user approval before M1-WP02.
+    required_action: GitHub Actions CI, ChatGPT second-layer review, and user approval before M1-WP03.

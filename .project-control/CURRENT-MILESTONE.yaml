@@ -10,5 +10,6 @@ milestone:
   notes:
     - M0 baseline consolidation is completed and retained as project history.
     - M0.5 is passed after PR #2 was merged to main by the user.
-    - M1-WP01 Production Persistence Contract is explicitly approved and ready for review.
+    - M1-WP01 Production Persistence Contract passed after PR #3 was merged to main by the user.
+    - M1-WP02 Intake Persistence is explicitly approved and ready for review.
     - M1 does not authorize database write, migration execution, n8n activation, server change, or real outreach.
