@@ -19,7 +19,7 @@
 
 ## 3. 当前最高优先级
 
-M1-WP01 Production Persistence Contract：已完成本地接口、脱敏、版本锚点和 DRAFT migration 对齐审查，等待第二层审查。不得连接数据库、执行 migration、修改 `public.leads` v0.1 评分字段、激活 n8n、操作服务器或开始 M1-WP02。
+M1-WP01 Production Persistence Contract：PR #3 已创建，等待 CI 与第二层审查。已完成本地接口、脱敏、版本锚点和 DRAFT migration 对齐审查；不得连接数据库、执行 migration、修改 `public.leads` v0.1 评分字段、激活 n8n、操作服务器或开始 M1-WP02。
 
 ## 4. 核心架构
 
