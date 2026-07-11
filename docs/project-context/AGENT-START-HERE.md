@@ -78,5 +78,5 @@ ba0afb87e7daffdfb3f9e0f6ba5a8e9f59b9db39
 
 ## 9. 当前审查状态
 
-- M1-WP02 的实现已提交至 PR #4，CI 状态为 PENDING。
+- M1-WP02 的实现已提交至 PR #4，CI 状态为 PASSED。
 - 不得自动合并 PR，也不得在审查完成前开始 M1-WP03。

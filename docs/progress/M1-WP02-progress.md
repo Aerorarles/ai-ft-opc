@@ -27,7 +27,7 @@
 ## Pull Request
 
 - PR #4 已创建：`feat(intake): add local M1 intake persistence`。
-- GitHub Actions CI 状态：PENDING；通过后仍需第二层审查和用户批准。
+- GitHub Actions CI 状态：PASSED；仍需第二层审查和用户批准。
 
 ## Known Limitations
 
