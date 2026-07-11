@@ -25,6 +25,11 @@
 - 不保存完整 email、phone、notes、URL query 或原始 payload。
 - 不写生产表或 v0.1 字段。
 
+## Pull Request 状态
+
+- PR #4：`feat(intake): add local M1 intake persistence`。
+- 当前 GitHub Actions CI：PENDING。CI 通过后仍需第二层审查与用户批准。
+
 ## 风险
 
 内存 repository 只能验证行为契约，不能证明真实数据库事务、约束、索引或并发幂等。

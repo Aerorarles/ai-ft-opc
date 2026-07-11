@@ -24,6 +24,11 @@
 - `npm.cmd run test:m1-contract`、`typecheck`、Phase 1/2、scoring、orchestration、orchestration-scoring 回归均通过。
 - 未连接数据库、未执行 SQL。
 
+## Pull Request
+
+- PR #4 已创建：`feat(intake): add local M1 intake persistence`。
+- GitHub Actions CI 状态：PENDING；通过后仍需第二层审查和用户批准。
+
 ## Known Limitations
 
 - 仅内存，进程重启后不保留 run/source item/candidate。

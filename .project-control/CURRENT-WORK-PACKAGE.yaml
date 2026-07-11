@@ -29,4 +29,8 @@ work_package:
   next_work_package_name: Shadow Scoring Persistence
   next_work_package_requires_explicit_user_approval: true
   review_gate:
+    pull_request:
+      number: 4
+      url: https://github.com/Aerorarles/ai-ft-opc/pull/4
+      ci_status: PENDING
     required_action: GitHub Actions CI, ChatGPT second-layer review, and user approval before M1-WP03.
