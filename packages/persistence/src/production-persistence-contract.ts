@@ -64,6 +64,22 @@ const PROHIBITED_PERSISTENCE_FIELDS = Object.freeze([
  */
 
 /**
+ * @typedef {Object} IntakeVersionAnchors
+ * @property {string} normalization_version
+ * @property {string} deduplication_version
+ * @property {string} contract_version
+ */
+
+/**
+ * @typedef {Object} IntakePersistenceEnvelope
+ * @property {PersistenceScope} scope
+ * @property {IntakeVersionAnchors} version_anchors
+ * @property {"manual" | "api" | "n8n" | "import"} trigger_source
+ * @property {Record<string, unknown>=} source_summary
+ * @property {Record<string, unknown>=} candidate_summary
+ */
+
+/**
  * @param {unknown} value
  * @returns {boolean}
  */
@@ -88,6 +104,27 @@ function collectProhibitedKeys(value, found) {
 }
 
 /**
+ * @param {Partial<PersistenceScope>} scope
+ * @param {string[]} errors
+ */
+function validateScope(scope, errors) {
+  for (const key of ["tenant_id", "request_trace_id", "idempotency_key"]) {
+    if (!isNonEmptyString(scope[key])) errors.push(`missing_scope:${key}`);
+  }
+}
+
+/**
+ * @param {unknown[]} values
+ * @param {string[]} errors
+ */
+function appendProhibitedKeyErrors(values, errors) {
+  /** @type {string[]} */
+  const prohibitedKeys = [];
+  for (const value of values) collectProhibitedKeys(value, prohibitedKeys);
+  for (const key of new Set(prohibitedKeys)) errors.push(`prohibited_persistence_key:${key}`);
+}
+
+/**
  * @param {unknown} candidate
  * @returns {{ valid: boolean, errors: string[] }}
  */
@@ -98,9 +135,7 @@ function validatePersistenceContractEnvelope(candidate) {
   const scope = envelope.scope || {};
   const anchors = envelope.version_anchors || {};
 
-  for (const key of ["tenant_id", "request_trace_id", "idempotency_key"]) {
-    if (!isNonEmptyString(scope[key])) errors.push(`missing_scope:${key}`);
-  }
+  validateScope(scope, errors);
   for (const key of [
     "config_version_id",
     "config_checksum",
@@ -113,11 +148,28 @@ function validatePersistenceContractEnvelope(candidate) {
   }
   if (!isNonEmptyString(envelope.run_mode)) errors.push("missing_run_mode");
 
+  appendProhibitedKeyErrors([envelope.input_summary, envelope.audit_summary], errors);
+
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * @param {unknown} candidate
+ * @returns {{ valid: boolean, errors: string[] }}
+ */
+function validateIntakePersistenceEnvelope(candidate) {
   /** @type {string[]} */
-  const prohibitedKeys = [];
-  collectProhibitedKeys(envelope.input_summary, prohibitedKeys);
-  collectProhibitedKeys(envelope.audit_summary, prohibitedKeys);
-  for (const key of new Set(prohibitedKeys)) errors.push(`prohibited_persistence_key:${key}`);
+  const errors = [];
+  const envelope = /** @type {Partial<IntakePersistenceEnvelope>} */ (candidate || {});
+  const scope = envelope.scope || {};
+  const anchors = envelope.version_anchors || {};
+
+  validateScope(scope, errors);
+  for (const key of ["normalization_version", "deduplication_version", "contract_version"]) {
+    if (!isNonEmptyString(anchors[key])) errors.push(`missing_intake_version_anchor:${key}`);
+  }
+  if (!isNonEmptyString(envelope.trigger_source)) errors.push("missing_trigger_source");
+  appendProhibitedKeyErrors([envelope.source_summary, envelope.candidate_summary], errors);
 
   return { valid: errors.length === 0, errors };
 }
@@ -127,4 +179,5 @@ module.exports = {
   LOGICAL_PERSISTENCE_ENTITIES,
   PROHIBITED_PERSISTENCE_FIELDS,
   validatePersistenceContractEnvelope,
+  validateIntakePersistenceEnvelope,
 };

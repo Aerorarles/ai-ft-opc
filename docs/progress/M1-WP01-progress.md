@@ -2,7 +2,7 @@
 
 版本：v1.0
 日期：2026-07-11
-状态：READY_FOR_REVIEW
+状态：PASSED — PR #3 merged by user
 适用范围：Production Persistence Contract
 禁止事项：未连接数据库、未写 SQL/migration、未写生产数据、未修改 n8n、Docker、服务器或真实外联。
 
@@ -24,7 +24,7 @@
 - `typecheck` 通过。
 - 既有 Phase 1/2、scoring、orchestration 回归命令通过。
 - 无 SQL 执行、无数据库连接。
-- PR #3 的 GitHub Actions `AI FT-OPC Validation` 已通过。
+- PR #3 的 GitHub Actions `AI FT-OPC Validation` 已通过，且 PR 已由用户合并到 main。
 
 ## Security Check
 
@@ -39,7 +39,7 @@
 
 ## Recommended Next
 
-等待 M1-WP01 第二层审查。下一候选为 M1-WP02 Intake Persistence，但必须获得明确批准。
+M1-WP01 已通过。M1-WP02 已获得明确批准并进入第二层审查。
 
 ## 验收标准
 
@@ -55,4 +55,4 @@
 
 ## 下一步入口
 
-M1-WP01 READY_FOR_REVIEW。
+M1-WP01 PASSED。

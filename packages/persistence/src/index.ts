@@ -3,6 +3,7 @@
 const { MemoryLeadRepository } = require("./memory/memory-lead-repository.ts");
 const { MemoryShadowRepository } = require("./memory/memory-shadow-repository.ts");
 const { MemoryReviewRepository } = require("./memory/memory-review-repository.ts");
+const { MemoryIntakeRepository } = require("./memory/memory-intake-repository.ts");
 const { PostgresLeadRepository } = require("./postgres/postgres-lead-repository.ts");
 const { PostgresShadowRepository } = require("./postgres/postgres-shadow-repository.ts");
 const { PostgresReviewRepository } = require("./postgres/postgres-review-repository.ts");
@@ -18,6 +19,7 @@ module.exports = {
   MemoryLeadRepository,
   MemoryShadowRepository,
   MemoryReviewRepository,
+  MemoryIntakeRepository,
   PostgresLeadRepository,
   PostgresShadowRepository,
   PostgresReviewRepository,

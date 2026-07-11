@@ -12,14 +12,14 @@
 ## 2. 当前项目状态
 
 - 当前 Milestone：M1 — Production Data Foundation（IN_PROGRESS）。
-- 当前 Work Package：M1-WP01 — Production Persistence Contract（READY_FOR_REVIEW）。
+- 当前 Work Package：M1-WP02 — Intake Persistence（READY_FOR_REVIEW）。
 - 已确认资产：Lead Agent v0.1 生产事实、Lead Enrichment v0.1.7 已封存事实、Phase 1 + Phase 2 本地 MVP、v0.2-v0.7 scoring engine、本地 orchestration runtime、Phase 3 安全架构设计。
 - 当前允许：受限本地文档与项目控制面工作、已批准范围内的本地代码/测试工作、后续经批准的 M1 设计与草案准备。
 - 未经批准不得做：数据库 migration 或写入、Docker/服务器操作、n8n 发布或激活、批量 Enrichment、真实客户触达、Git 写操作、付费数据源真实查询。
 
 ## 3. 当前最高优先级
 
-M1-WP01 Production Persistence Contract：PR #3 CI 已通过，等待第二层审查。已完成本地接口、脱敏、版本锚点和 DRAFT migration 对齐审查；不得连接数据库、执行 migration、修改 `public.leads` v0.1 评分字段、激活 n8n、操作服务器或开始 M1-WP02。
+M1-WP02 Intake Persistence：已完成本地 intake run、脱敏 source item、normalized pending-review candidate、tenant-scoped idempotency 与测试，等待第二层审查。不得连接数据库、执行 migration、写 `candidate_leads`/`public.leads`、激活 n8n、操作服务器或开始 M1-WP03。
 
 ## 4. 核心架构
 
@@ -75,3 +75,8 @@ ba0afb87e7daffdfb3f9e0f6ba5a8e9f59b9db39
 - 下一阶段入口。
 
 完整历史与长期路线保留在另外两份权威文档中。
+
+## 9. 当前审查状态
+
+- M1-WP02 的实现已提交至 PR #4，CI 状态为 PASSED。
+- 不得自动合并 PR，也不得在审查完成前开始 M1-WP03。
