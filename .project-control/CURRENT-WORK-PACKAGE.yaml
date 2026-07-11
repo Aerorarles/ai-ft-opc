@@ -1,0 +1,29 @@
+work_package:
+  id: M0.5-WP02
+  name: Restricted Git Automation
+  status: IN_PROGRESS
+  started_at: "2026-07-11"
+  allowed_scope:
+    - create_dedicated_work_branch
+    - exact_file_stage
+    - ordinary_commit
+    - push_dedicated_work_branch
+    - create_pull_request
+    - read_git_status_log_remote_and_pr_ci_state
+    - update_project_control_status_and_progress
+  forbidden_scope:
+    - direct_push_main
+    - force_push
+    - automatic_merge
+    - protected_branch_deletion
+    - shared_branch_rebase
+    - remote_history_reset
+    - broad_stage_commands
+    - conflict_self_resolution
+  predecessor:
+    id: M0.5-WP01
+    name: Project Control Plane
+    status: PASSED
+  next_work_package: M0.5-WP03
+  next_work_package_name: GitHub Actions CI
+  next_work_package_requires_explicit_user_approval: false

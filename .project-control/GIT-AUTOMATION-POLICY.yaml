@@ -1,0 +1,38 @@
+git_automation:
+  policy_version: "1.0"
+  status: USER_APPROVED_FOR_M0_5_WP02
+  approved_scope:
+    - create_dedicated_work_branch
+    - exact_file_stage_for_current_work_package
+    - ordinary_commit
+    - push_dedicated_work_branch
+    - create_pull_request
+    - read_git_status_log_remote_pr_and_ci_state
+  branch_rules:
+    required_prefix: codex/
+    protected_branch: main
+    direct_push_to_protected_branch: false
+    force_push: false
+    automatic_merge: false
+    protected_branch_deletion: false
+    shared_branch_rebase: false
+    remote_history_reset: false
+  staging_rules:
+    allowed_command_shape: git_add_double_dash_exact_paths_only
+    prohibited_commands:
+      - git_add_dot
+      - git_add_all
+      - git_commit_all
+    required_pre_commit_checks:
+      - git_diff_cached_name_only
+      - git_diff_cached_check
+      - git_diff_cached_review
+  stop_conditions:
+    - git_conflict
+    - remote_divergence
+    - permission_error
+    - unexpected_staged_file
+    - secret_or_credential_risk
+    - scope_expansion_required
+  current_branch: codex/m0-5-wp02-restricted-git-automation
+  current_work_package: M0.5-WP02

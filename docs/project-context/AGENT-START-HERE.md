@@ -2,26 +2,24 @@
 
 ## 1. 必读顺序
 
-1. 本文件
-2. AI-FT-OPC-project-handover.md
-3. AI-FT-OPC-architecture-roadmap.md
-4. 本次任务涉及的 workflow / SQL / docs / migration
+1. [AI-FT-OPC-MASTER-ARCHITECTURE-COMMERCIAL-ROADMAP-v1.0-LATEST.md](AI-FT-OPC-MASTER-ARCHITECTURE-COMMERCIAL-ROADMAP-v1.0-LATEST.md)
+2. [AI-FT-OPC-CURRENT-STATUS.md](../project-status/AI-FT-OPC-CURRENT-STATUS.md)
+3. 当前 Milestone / Work Package 文件
+4. 仅在需要历史实现细节时，再读取 project handover、architecture roadmap、master memory、Phase 3 设计及本次任务涉及的 workflow / SQL / docs / migration
+
+最新 master architecture 是当前最高主体架构约束；历史文件用于已发生事实、专项设计和验收记录，不得取代最新 master architecture。
 
 ## 2. 当前项目状态
 
-- 当前阶段：Lead Agent v0.1 已稳定闭环、Git 归档、服务器同步完成。
-- 当前允许：v0.2 架构设计、数据模型草案、评分配置化设计、权限与审计设计、管理后台 MVP 信息架构、Safe Change Skill 设计、MCP 最小权限规划。
-- 当前未经批准不得做：数据库 migration、数据库写入、Docker/服务器操作、n8n 发布或激活、批量 Enrichment、真实客户触达、Git commit/push/pull、付费数据源真实查询。
+- 当前 Milestone：M0.5 — Autonomous Delivery Foundation。
+- 当前 Work Package：M0.5-WP01 — Project Control Plane。
+- 已确认资产：Lead Agent v0.1 生产事实、Lead Enrichment v0.1.7 已封存事实、Phase 1 + Phase 2 本地 MVP、v0.2-v0.7 scoring engine、本地 orchestration runtime、Phase 3 安全架构设计。
+- 当前允许：受限本地文档与项目控制面工作、已批准范围内的本地代码/测试工作、后续经批准的 M1 设计与草案准备。
+- 未经批准不得做：数据库 migration 或写入、Docker/服务器操作、n8n 发布或激活、批量 Enrichment、真实客户触达、Git 写操作、付费数据源真实查询。
 
 ## 3. 当前最高优先级
 
-Lead Scoring v0.2 的架构设计：
-- 评分配置化；
-- 关键词、国家、行业、权重规则；
-- 配置表；
-- 权限与审计；
-- 变更影响与回滚；
-- 管理后台 MVP 边界。
+执行 M0.5-WP02 Restricted Git Automation：仅在专用 `codex/` 工作分支上精确暂存当前 Work Package 文件、普通提交、推送工作分支并创建 PR。禁止直接 push main、force push、自动 merge、共享分支 rebase 或远程历史重写；出现冲突、远程分叉、权限异常或敏感文件风险必须停止。
 
 ## 4. 核心架构
 
