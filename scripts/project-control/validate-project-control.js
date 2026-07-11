@@ -27,7 +27,7 @@ for (const relativePath of [
 }
 
 requireMatch(control, /id:\s*ai-ft-opc/, "project_id");
-requireMatch(milestone, /id:\s*M0\.5/, "milestone_id");
+requireMatch(milestone, /id:\s*M\d+(?:\.\d+)?/, "milestone_id");
 requireMatch(workPackage, /status:\s*(PASSED|READY_FOR_REVIEW|IN_PROGRESS|BLOCKED)/, "work_package_status");
 requireMatch(nextAction, /type:\s*(WAIT_FOR_REVIEW|STOP|EXECUTE_WORK_PACKAGE|RUN_TESTS)/, "next_action_type");
 

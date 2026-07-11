@@ -13,7 +13,8 @@
     "phase2:demo": "tsx apps/api-server/phase2-demo.ts",
     "phase2:test": "tsx apps/api-server/phase2-tests.ts",
     "phase2:server": "tsx apps/api-server/phase2-http-server.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:m1-contract": "tsx apps/api-server/m1-persistence-contract-tests.ts"
   },
   "dependencies": {
     "@types/node": "^24.0.8",

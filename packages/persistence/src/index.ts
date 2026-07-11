@@ -7,6 +7,12 @@ const { PostgresLeadRepository } = require("./postgres/postgres-lead-repository.
 const { PostgresShadowRepository } = require("./postgres/postgres-shadow-repository.ts");
 const { PostgresReviewRepository } = require("./postgres/postgres-review-repository.ts");
 const { assertPostgresShadowWriteAllowed, DISABLED_MESSAGE } = require("./guards.ts");
+const {
+  PRODUCTION_PERSISTENCE_CONTRACT_VERSION,
+  LOGICAL_PERSISTENCE_ENTITIES,
+  PROHIBITED_PERSISTENCE_FIELDS,
+  validatePersistenceContractEnvelope,
+} = require("./production-persistence-contract.ts");
 
 module.exports = {
   MemoryLeadRepository,
@@ -17,4 +23,8 @@ module.exports = {
   PostgresReviewRepository,
   assertPostgresShadowWriteAllowed,
   DISABLED_MESSAGE,
+  PRODUCTION_PERSISTENCE_CONTRACT_VERSION,
+  LOGICAL_PERSISTENCE_ENTITIES,
+  PROHIBITED_PERSISTENCE_FIELDS,
+  validatePersistenceContractEnvelope,
 };

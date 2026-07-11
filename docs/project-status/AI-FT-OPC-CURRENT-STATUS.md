@@ -1,22 +1,22 @@
 # AI FT-OPC Current Status
 
-版本：M0.5 Gate v1.0
+版本：M1-WP01 v1.0
 日期：2026-07-11
-状态：CURRENT CONTROL STATE — READY_FOR_GATE
+状态：CURRENT CONTROL STATE — READY_FOR_REVIEW
 适用范围：项目当前事实入口
 禁止事项：本状态文件不授权数据库、n8n、Docker、服务器、Git 写操作或真实外联。
 
 ## Current Milestone
 
-M0.5 — Autonomous Delivery Foundation
+M1 — Production Data Foundation
 
 ## Current Work Package
 
-M0.5 Gate Review — WP01-WP06 Complete
+M1-WP01 — Production Persistence Contract
 
 ## Overall State
 
-M0 已完成基线冻结。M0.5-WP01-WP06 已完成：控制面、受限 Git、PR CI、Continuation Protocol、只读入口与进度/审批报告已建立。PR #2 的 GitHub Actions 检查已通过。M0.5 现在等待人工审查和单独批准的 main branch merge；M1 Production Data Foundation 尚未开始。
+M0 已完成基线冻结。M0.5-WP01-WP06 已完成，PR #2 已由用户合并到 main。M1-WP01 已在专用工作分支完成本地 Production Persistence Contract，等待第二层审查；未连接数据库，未创建或执行 SQL migration。
 
 ## Recently Completed
 
@@ -24,8 +24,8 @@ M0 已完成基线冻结。M0.5-WP01-WP06 已完成：控制面、受限 Git、P
 - Current System Inventory、Interface Map、Commercial v1.0 Gap Register、M1 Plan 与 M0 progress report 已建立。
 - 本地 typecheck、Phase 1/2、scoring、orchestration 与 orchestration-scoring 测试通过。
 - M0.5-WP01 Project Control Plane 已通过；M0.5-WP02 受限 Git 分支/PR 交付已完成并由用户合并。
-- M0.5-WP03 已配置并通过 typecheck、Phase 1/2、scoring 与 orchestration 的 PR CI。
-- M0.5-WP04 Continuation Protocol、WP05 只读入口、WP06 进度与审批报告均已建立。
+- M0.5 已完成并通过 PR CI；受限 Git、Continuation Protocol、只读入口和进度/审批报告已归档。
+- M1-WP01 已定义 persistence 逻辑实体、scope、version anchors、敏感字段边界与 DRAFT migration 对齐差距。
 
 ## Current Baseline
 
@@ -42,8 +42,8 @@ M0 已完成基线冻结。M0.5-WP01-WP06 已完成：控制面、受限 Git、P
 
 ## Pending Approvals
 
-- PR #2 的人工审查与 main branch merge gate。Codex 不得自动 merge。
-- M1-WP01 及任何数据库、n8n、服务器、生产或真实外联动作的明确批准。
+- M1-WP01 第二层审查。
+- M1-WP02 Intake Persistence 及任何数据库、n8n、服务器、生产或真实外联动作的明确批准。
 - 任一 M1 Work Package 的明确范围。
 - 数据库 schema/migration 草案评审与未来执行授权。
 - 真实单条 shadow 写入、n8n inactive 导入/验证、HTTP server 启动或真实数据接入。
@@ -54,7 +54,7 @@ M0 已完成基线冻结。M0.5-WP01-WP06 已完成：控制面、受限 Git、P
 
 ## Next Work Package
 
-人工审查并明确批准 PR #2 合并后，M0.5 可标记为 PASSED。之后仍需单独批准 M1-WP01 Production Persistence Contract；不得自动进入数据库或生产实现。
+审查 M1-WP01 后，用户可明确批准 M1-WP02 Intake Persistence。任何 migration、数据库写入、n8n 激活或生产动作仍需独立 Gate。
 
 ## 验收标准
 

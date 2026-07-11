@@ -1,7 +1,7 @@
 next_action:
   type: WAIT_FOR_REVIEW
-  target: M0.5
-  reason: M0.5-WP01 through M0.5-WP06 are complete; PR #2 CI passed and the milestone is ready for human review and the separately approved main branch merge gate.
+  target: M1-WP01
+  reason: M1-WP01 contract, local validation, and DRAFT migration alignment review are complete; second-layer review is required before the next M1 Work Package.
   required_actor: ChatGPT_and_user
   blocking: true
   updated_at: "2026-07-11"
@@ -10,5 +10,6 @@ next_action:
     - migration_execution
     - production_n8n_activation
     - real_outreach
-    - main_branch_merge_without_explicit_approval
-    - M1_execution_without_explicit_user_approval
+    - M1-WP02_execution_without_explicit_user_approval
+    - production_database_write
+    - migration_execution

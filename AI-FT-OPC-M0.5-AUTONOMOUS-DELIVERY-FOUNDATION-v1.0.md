@@ -4,7 +4,7 @@
 > **Name**: Autonomous Delivery Foundation
 > **Version**: v1.0
 > **Date**: 2026-07-11
-> **Status**: IN_PROGRESS
+> **Status**: PASSED
 > **Parent Roadmap**: `AI-FT-OPC-MASTER-ARCHITECTURE-COMMERCIAL-ROADMAP-v1.0-LATEST.md`
 
 ---
@@ -394,12 +394,13 @@ M1 的低风险本地开发可以进入持续执行模式。
 
 ```text
 M0 Architecture Freeze          PASSED / BASELINE COMPLETE
-M0.5 Autonomous Delivery        READY_FOR_GATE
+M0.5 Autonomous Delivery        PASSED
 M0.5-WP01 Project Control Plane PASSED
 M0.5-WP02 Restricted Git Automation PASSED
 M0.5-WP03 GitHub Actions CI PASSED — PR #2 CI passed
 M0.5-WP04 Codex Continuation Protocol PASSED
 M0.5-WP05 Automated Continuation Entry Point PASSED
 M0.5-WP06 Progress & Approval Reporting PASSED
+M1 Production Data Foundation   IN_PROGRESS — M1-WP01 READY_FOR_REVIEW
 M1 Production Data Foundation   NOT_STARTED
 ```
