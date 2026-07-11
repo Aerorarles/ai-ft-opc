@@ -24,7 +24,7 @@
 - `typecheck` 通过。
 - 既有 Phase 1/2、scoring、orchestration 回归命令通过。
 - 无 SQL 执行、无数据库连接。
-- PR #3 已创建，等待 GitHub Actions `AI FT-OPC Validation` 结果。
+- PR #3 的 GitHub Actions `AI FT-OPC Validation` 已通过。
 
 ## Security Check
 
