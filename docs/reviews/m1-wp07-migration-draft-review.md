@@ -1,5 +1,7 @@
 # M1-WP07 Migration Draft Review Pack
 
+<!-- 2026-07-12: PR #9 GitHub Actions CI PASSED. Second-layer review and explicit user approval remain required before any database preflight or execution. -->
+
 版本：v1.0
 日期：2026-07-12
 状态：READY_FOR_REVIEW

@@ -1,5 +1,7 @@
 # M1-WP07 Progress Report
 
+<!-- 2026-07-12: PR #9 is open and GitHub Actions CI PASSED. M1-WP07 remains READY_FOR_REVIEW; database preflight and migration execution remain unapproved. -->
+
 版本：v1.0
 日期：2026-07-12
 状态：READY_FOR_REVIEW

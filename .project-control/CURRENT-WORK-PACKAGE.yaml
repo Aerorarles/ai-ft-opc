@@ -30,4 +30,8 @@ work_package:
   next_work_package_name: M1 Exit and Controlled Implementation Approval Review
   next_work_package_requires_explicit_user_approval: true
   review_gate:
+    pull_request:
+      number: 9
+      url: https://github.com/Aerorarles/ai-ft-opc/pull/9
+      ci_status: PASSED
     required_action: GitHub Actions CI, second-layer review, and user approval before any database preflight or M1 exit action.
