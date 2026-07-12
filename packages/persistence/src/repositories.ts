@@ -11,10 +11,12 @@
 /**
  * @typedef {{
  *   createShadowRun(run: import("./types.ts").ShadowRun): Promise<import("./types.ts").ShadowRun>,
+ *   getShadowRunByIdempotencyKey(tenantId: string, idempotencyKey: string): Promise<import("./types.ts").ShadowRun | null>,
  *   updateShadowRunStatus(runId: string, patch: Partial<import("./types.ts").ShadowRun>): Promise<import("./types.ts").ShadowRun>,
  *   createShadowResult(result: import("./types.ts").ShadowResult): Promise<import("./types.ts").ShadowResult>,
  *   createShadowDiff(diff: import("./types.ts").ShadowDiff): Promise<import("./types.ts").ShadowDiff>,
- *   createShadowExplanations(explanations: Record<string, unknown>[]): Promise<Record<string, unknown>[]>,
+ *   createShadowExplanations(explanations: import("./types.ts").ShadowExplanation[]): Promise<import("./types.ts").ShadowExplanation[]>,
+ *   getShadowExplanationsByResult(resultId: string): Promise<import("./types.ts").ShadowExplanation[]>,
  *   getShadowHistoryByLead(leadId: string): Promise<Array<{ run: import("./types.ts").ShadowRun | null, result: import("./types.ts").ShadowResult, diff: import("./types.ts").ShadowDiff | null }>>,
  *   getLatestShadowResultByLead(leadId: string): Promise<import("./types.ts").ShadowResult | null>
  * }} ShadowRepository

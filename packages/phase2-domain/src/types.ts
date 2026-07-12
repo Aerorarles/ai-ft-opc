@@ -29,15 +29,24 @@
  * @typedef {Object} ShadowRun
  * @property {string} shadow_run_id
  * @property {"shadow"} run_mode
+ * @property {string} tenant_id
+ * @property {string | null} organization_id
+ * @property {string | null} actor_user_id
  * @property {string} trigger_source
  * @property {string} request_trace_id
+ * @property {string} idempotency_key
  * @property {string} config_version
+ * @property {string} config_version_id
  * @property {string} config_checksum
  * @property {string} engine_version
+ * @property {string} outcome_policy_id
+ * @property {string} outcome_policy_version
+ * @property {string} outcome_policy_checksum
  * @property {ShadowRunStatus} run_status
  * @property {number} lead_count
  * @property {string | null} started_at
  * @property {string | null} completed_at
+ * @property {string | null} error_code
  * @property {string | null} error_summary
  * @property {string} created_at
  */
@@ -51,11 +60,17 @@
  * @property {Record<string, unknown>} breakdown_summary
  * @property {number} applied_rule_count
  * @property {string} config_version
+ * @property {string} config_version_id
  * @property {string} config_checksum
  * @property {string} engine_version
+ * @property {string} outcome_policy_id
+ * @property {string} outcome_policy_version
+ * @property {string} outcome_policy_checksum
  * @property {boolean} replay_consistency
  * @property {string} inconsistency_type
  * @property {Record<string, unknown>} input_summary
+ * @property {"valid" | "invalid" | "not_checked"} validation_status
+ * @property {string[]} validation_errors_summary
  * @property {string} created_at
  */
 
@@ -73,6 +88,23 @@
  * @property {"same" | "different" | "not_evaluated"} priority_diff_status
  * @property {boolean} requires_review
  * @property {Record<string, unknown>} diff_summary
+ * @property {string} created_at
+ */
+
+/**
+ * @typedef {Object} ShadowExplanation
+ * @property {string} shadow_explanation_id
+ * @property {string} shadow_result_id
+ * @property {string} rule_id
+ * @property {string | null} rule_type
+ * @property {string | null} field
+ * @property {string | null} operator
+ * @property {string | null} dimension
+ * @property {number | null} raw_delta
+ * @property {number | null} weight
+ * @property {number | null} effective_delta
+ * @property {string} expected_value_summary
+ * @property {string} actual_value_summary
  * @property {string} created_at
  */
 

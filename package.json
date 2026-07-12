@@ -15,7 +15,8 @@
     "phase2:server": "tsx apps/api-server/phase2-http-server.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:m1-contract": "tsx apps/api-server/m1-persistence-contract-tests.ts",
-    "test:m1-intake": "tsx apps/api-server/m1-intake-persistence-tests.ts"
+    "test:m1-intake": "tsx apps/api-server/m1-intake-persistence-tests.ts",
+    "test:m1-shadow": "tsx apps/api-server/m1-shadow-persistence-tests.ts"
   },
   "dependencies": {
     "@types/node": "^24.0.8",

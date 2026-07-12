@@ -11,5 +11,6 @@ milestone:
     - M0 baseline consolidation is completed and retained as project history.
     - M0.5 is passed after PR #2 was merged to main by the user.
     - M1-WP01 Production Persistence Contract passed after PR #3 was merged to main by the user.
-    - M1-WP02 Intake Persistence is implemented locally; PR #4 CI passed and second-layer review is pending.
+    - M1-WP02 Intake Persistence passed after PR #4 was merged to main by the user.
+    - M1-WP03 Shadow Scoring Persistence is implemented locally; PR #5 CI passed and second-layer review is pending.
     - M1 does not authorize database write, migration execution, n8n activation, server change, or real outreach.

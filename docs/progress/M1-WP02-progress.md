@@ -2,7 +2,7 @@
 
 版本：v1.0
 日期：2026-07-11
-状态：READY_FOR_REVIEW
+状态：PASSED — PR #4 merged by user
 适用范围：Intake Persistence（local memory only）
 禁止事项：不连接数据库、不创建或执行 SQL migration、不写 `candidate_leads`/`public.leads`、不修改 n8n、Docker、服务器或真实外联。
 
@@ -27,7 +27,7 @@
 ## Pull Request
 
 - PR #4 已创建：`feat(intake): add local M1 intake persistence`。
-- GitHub Actions CI 状态：PASSED；仍需第二层审查和用户批准。
+- GitHub Actions CI 状态：PASSED，且 PR #4 已由用户合并到 main。
 
 ## Known Limitations
 
@@ -37,7 +37,7 @@
 
 ## Recommended Next
 
-等待 M1-WP02 第二层审查。M1-WP03 Shadow Scoring Persistence 需要新的明确批准。
+M1-WP02 已通过。M1-WP03 Shadow Scoring Persistence 已获得明确批准并进入第二层审查。
 
 ## 验收标准
 
@@ -53,4 +53,4 @@
 
 ## 下一步入口
 
-M1-WP02 READY_FOR_REVIEW。
+M1-WP02 PASSED。
