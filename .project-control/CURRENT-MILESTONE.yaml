@@ -17,5 +17,6 @@ milestone:
     - M1-WP05 Audit Foundation passed after PR #7 was merged to main by the user.
     - M1-WP06 Idempotency & Replay Safety passed after PR #8 was merged to main by the user.
     - M1-WP07 Migration Draft Review Package passed after PR #9 was merged to main by the user.
-    - M1 exit review is documented in PR #10 with GitHub Actions CI passed; controlled production persistence is not approved or implemented.
+    - M1 exit review passed after PR #10 was merged to main by the user; controlled production persistence is not approved or implemented.
+    - The user approved a restricted database read-only preflight; PR #11 documents the blocked client entry point with GitHub Actions CI passed. No database connection was attempted.
     - M1 does not authorize database write, migration execution, n8n activation, server change, or real outreach.
