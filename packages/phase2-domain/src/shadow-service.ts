@@ -2,6 +2,7 @@
 
 const { scoreLeadAPI } = require("../../../scoring-engine/src/api/scoring-service.ts");
 const { decidePhase2Lead } = require("./decision-service.ts");
+const { validateShadowPersistenceEnvelope } = require("../../persistence/src/production-persistence-contract.ts");
 
 /**
  * @param {string} prefix
@@ -30,6 +31,44 @@ function toScoringLead(lead) {
 }
 
 /**
+ * Keep explanation values descriptive but non-reversible. Rule values are
+ * execution inputs, not persisted shadow explanation payloads.
+ *
+ * @param {unknown} value
+ * @returns {string}
+ */
+function summarizeConfiguredValue(value) {
+  if (value === null || value === undefined) return "not_applicable";
+  if (Array.isArray(value)) return `configured_list(count=${value.length})`;
+  if (typeof value === "boolean") return `configured_boolean(${value})`;
+  return "configured_scalar";
+}
+
+/**
+ * @param {string} shadowResultId
+ * @param {import("../../../scoring-engine/src/types.ts").AppliedRule[]} appliedRules
+ * @param {string} createdAt
+ * @returns {import("./types.ts").ShadowExplanation[]}
+ */
+function toShadowExplanations(shadowResultId, appliedRules, createdAt) {
+  return appliedRules.map((rule, index) => ({
+    shadow_explanation_id: `${shadowResultId}:rule:${index}`,
+    shadow_result_id: shadowResultId,
+    rule_id: rule.rule_id,
+    rule_type: rule.rule_type || null,
+    field: rule.field || null,
+    operator: rule.operator || null,
+    dimension: rule.dimension || null,
+    raw_delta: typeof rule.raw_delta === "number" ? rule.raw_delta : null,
+    weight: typeof rule.weight === "number" ? rule.weight : null,
+    effective_delta: typeof rule.effective_delta === "number" ? rule.effective_delta : null,
+    expected_value_summary: summarizeConfiguredValue(rule.expected_value),
+    actual_value_summary: String(rule.actual_value_summary || "not_available").slice(0, 120),
+    created_at: createdAt,
+  }));
+}
+
+/**
  * @param {{
  *   lead_id: string,
  *   leadSnapshot?: import("./types.ts").ExistingLeadSnapshot,
@@ -40,6 +79,10 @@ function toScoringLead(lead) {
  *   request_trace_id: string,
  *   trigger_source: string,
  *   allow_shadow_write: boolean,
+ *   tenant_id?: string,
+ *   organization_id?: string | null,
+ *   actor_user_id?: string | null,
+ *   idempotency_key?: string,
  *   force_invalid_config?: boolean,
  *   force_replay_inconsistency?: boolean
  * }} input
@@ -47,6 +90,26 @@ function toScoringLead(lead) {
 async function runSingleLeadShadow(input) {
   const lead = input.leadSnapshot || await input.leadRepository.getLeadSnapshot(input.lead_id);
   if (!lead) throw new Error(`lead_snapshot_not_found:${input.lead_id}`);
+  const tenantId = input.tenant_id || "local";
+  const idempotencyKey = input.idempotency_key || `shadow:${input.request_trace_id}:${lead.id}`;
+  const existingRun = input.allow_shadow_write
+    ? await input.shadowRepository.getShadowRunByIdempotencyKey(tenantId, idempotencyKey)
+    : null;
+  if (existingRun) {
+    const history = await input.shadowRepository.getShadowHistoryByLead(lead.id);
+    const existing = history.find((item) => item.run && item.run.shadow_run_id === existingRun.shadow_run_id) || null;
+    return {
+      mode: "memory_shadow_reused",
+      reused: true,
+      lead,
+      run: existingRun,
+      result: existing ? existing.result : null,
+      diff: existing ? existing.diff : null,
+      decision: null,
+      review_item: null,
+      explanations: existing ? await input.shadowRepository.getShadowExplanationsByResult(existing.result.shadow_result_id) : [],
+    };
+  }
   const now = new Date().toISOString();
   const shadowRunId = id("shadow-run");
   const shadowResultId = id("shadow-result");
@@ -72,7 +135,10 @@ async function runSingleLeadShadow(input) {
   const replayConsistency = blocked ? false : (input.force_replay_inconsistency ? false : scoring.replay_metadata.is_consistent === true);
   const inconsistencyType = blocked ? "CONFIG_MISMATCH" : (input.force_replay_inconsistency ? "RERUN_DIFFERENCE" : String(scoring.replay_metadata.inconsistency_type || "NONE"));
   const configChecksum = blocked ? "invalid-config" : String(scoring.replay_metadata.config_checksum || scoring.execution_id);
-  const engineVersion = blocked ? "0.6" : "0.6";
+  const engineVersion = blocked ? "0.6" : String(scoring.replay_metadata.engine_version || "0.6");
+  const outcomePolicyId = blocked ? "not-configured" : String(scoring.replay_metadata.outcome_policy_id || "not-configured");
+  const outcomePolicyVersion = blocked ? "not-configured" : String(scoring.replay_metadata.outcome_policy_version || "not-configured");
+  const outcomePolicyChecksum = blocked ? "not-configured" : String(scoring.replay_metadata.outcome_policy_checksum || "not-configured");
   const scoreDelta = typeof shadowScore === "number" ? shadowScore - lead.v01_score : null;
   const requiresReview = blocked || replayConsistency === false || (scoreDelta !== null && Math.abs(scoreDelta) >= 15);
   const decision = decidePhase2Lead(lead, shadowScore, { replayConsistency, blocked });
@@ -80,15 +146,24 @@ async function runSingleLeadShadow(input) {
   const run = {
     shadow_run_id: shadowRunId,
     run_mode: "shadow",
+    tenant_id: tenantId,
+    organization_id: input.organization_id || null,
+    actor_user_id: input.actor_user_id || null,
     trigger_source: input.trigger_source,
     request_trace_id: input.request_trace_id,
+    idempotency_key: idempotencyKey,
     config_version: input.config_version,
+    config_version_id: input.config_version,
     config_checksum: configChecksum,
     engine_version: engineVersion,
+    outcome_policy_id: outcomePolicyId,
+    outcome_policy_version: outcomePolicyVersion,
+    outcome_policy_checksum: outcomePolicyChecksum,
     run_status: blocked ? "blocked" : "succeeded",
     lead_count: 1,
     started_at: now,
     completed_at: now,
+    error_code: blocked ? "invalid_config_blocked" : null,
     error_summary: blocked ? "invalid_config_blocked" : null,
     created_at: now,
   };
@@ -100,11 +175,17 @@ async function runSingleLeadShadow(input) {
     breakdown_summary: blocked ? {} : scoring.breakdown,
     applied_rule_count: blocked ? 0 : scoring.applied_rules.length,
     config_version: input.config_version,
+    config_version_id: input.config_version,
     config_checksum: configChecksum,
     engine_version: engineVersion,
+    outcome_policy_id: outcomePolicyId,
+    outcome_policy_version: outcomePolicyVersion,
+    outcome_policy_checksum: outcomePolicyChecksum,
     replay_consistency: replayConsistency,
     inconsistency_type: inconsistencyType,
     input_summary: blocked ? { blocked: true } : scoring.explanation.input_summary,
+    validation_status: blocked ? "invalid" : "valid",
+    validation_errors_summary: blocked ? ["invalid_config_blocked"] : [],
     created_at: now,
   };
   const diff = {
@@ -122,6 +203,38 @@ async function runSingleLeadShadow(input) {
     diff_summary: { score_delta: scoreDelta, requires_review: requiresReview },
     created_at: now,
   };
+  const explanations = blocked ? [] : toShadowExplanations(shadowResultId, scoring.applied_rules, now);
+  const persistenceValidation = validateShadowPersistenceEnvelope({
+    scope: {
+      tenant_id: tenantId,
+      organization_id: input.organization_id || null,
+      actor_user_id: input.actor_user_id || null,
+      request_trace_id: input.request_trace_id,
+      idempotency_key: idempotencyKey,
+    },
+    version_anchors: {
+      config_version_id: input.config_version,
+      config_checksum: configChecksum,
+      engine_version: engineVersion,
+      outcome_policy_id: outcomePolicyId,
+      outcome_policy_version: outcomePolicyVersion,
+      outcome_policy_checksum: outcomePolicyChecksum,
+    },
+    run_mode: "shadow",
+    input_summary: result.input_summary,
+    result_summary: {
+      total_score: result.shadow_score,
+      applied_rule_count: result.applied_rule_count,
+      replay_consistency: result.replay_consistency,
+      inconsistency_type: result.inconsistency_type,
+      validation_status: result.validation_status,
+    },
+    diff_summary: diff.diff_summary,
+    explanations,
+  });
+  if (!persistenceValidation.valid) {
+    throw new Error(`shadow_contract_invalid:${persistenceValidation.errors.join(",")}`);
+  }
   const review = {
     review_item_id: reviewItemId,
     lead_id: lead.id,
@@ -142,21 +255,25 @@ async function runSingleLeadShadow(input) {
     await input.shadowRepository.createShadowRun(run);
     await input.shadowRepository.createShadowResult(result);
     await input.shadowRepository.createShadowDiff(diff);
+    await input.shadowRepository.createShadowExplanations(explanations);
     await input.reviewRepository.createReviewItem(review);
   }
 
   return {
     mode: input.allow_shadow_write ? "memory_shadow_write" : "preview_only",
+    reused: false,
     lead,
     run,
     result,
     diff,
     decision,
     review_item: input.allow_shadow_write ? review : null,
+    explanations: input.allow_shadow_write ? explanations : [],
   };
 }
 
 module.exports = {
   runSingleLeadShadow,
   toScoringLead,
+  toShadowExplanations,
 };

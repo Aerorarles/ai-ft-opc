@@ -5,6 +5,7 @@
  * @typedef {import("../../phase2-domain/src/types.ts").ShadowRun} ShadowRun
  * @typedef {import("../../phase2-domain/src/types.ts").ShadowResult} ShadowResult
  * @typedef {import("../../phase2-domain/src/types.ts").ShadowDiff} ShadowDiff
+ * @typedef {import("../../phase2-domain/src/types.ts").ShadowExplanation} ShadowExplanation
  * @typedef {import("../../phase2-domain/src/types.ts").ReviewQueueItem} ReviewQueueItem
  */
 

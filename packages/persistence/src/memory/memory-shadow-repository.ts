@@ -7,12 +7,21 @@ class MemoryShadowRepository {
   results = new Map();
   /** @type {Map<string, import("../types.ts").ShadowDiff>} */
   diffs = new Map();
-  /** @type {Record<string, unknown>[]} */
-  explanations = [];
+  /** @type {Map<string, import("../types.ts").ShadowExplanation[]>} */
+  explanationsByResult = new Map();
+  /** @type {Map<string, string>} */
+  idempotencyIndex = new Map();
 
   async createShadowRun(run) {
     this.runs.set(run.shadow_run_id, run);
+    this.idempotencyIndex.set(`${run.tenant_id}:${run.idempotency_key}`, run.shadow_run_id);
     return run;
+  }
+
+  /** @param {string} tenantId @param {string} idempotencyKey */
+  async getShadowRunByIdempotencyKey(tenantId, idempotencyKey) {
+    const runId = this.idempotencyIndex.get(`${tenantId}:${idempotencyKey}`);
+    return runId ? this.runs.get(runId) || null : null;
   }
 
   async updateShadowRunStatus(runId, patch) {
@@ -34,8 +43,17 @@ class MemoryShadowRepository {
   }
 
   async createShadowExplanations(explanations) {
-    this.explanations.push(...explanations);
+    for (const explanation of explanations) {
+      const current = this.explanationsByResult.get(explanation.shadow_result_id) || [];
+      current.push(explanation);
+      this.explanationsByResult.set(explanation.shadow_result_id, current);
+    }
     return explanations;
+  }
+
+  /** @param {string} resultId */
+  async getShadowExplanationsByResult(resultId) {
+    return [...(this.explanationsByResult.get(resultId) || [])];
   }
 
   async getShadowHistoryByLead(leadId) {

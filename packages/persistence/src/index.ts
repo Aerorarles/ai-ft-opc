@@ -13,6 +13,7 @@ const {
   LOGICAL_PERSISTENCE_ENTITIES,
   PROHIBITED_PERSISTENCE_FIELDS,
   validatePersistenceContractEnvelope,
+  validateShadowPersistenceEnvelope,
 } = require("./production-persistence-contract.ts");
 
 module.exports = {
@@ -29,4 +30,5 @@ module.exports = {
   LOGICAL_PERSISTENCE_ENTITIES,
   PROHIBITED_PERSISTENCE_FIELDS,
   validatePersistenceContractEnvelope,
+  validateShadowPersistenceEnvelope,
 };

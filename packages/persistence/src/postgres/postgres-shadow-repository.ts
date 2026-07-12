@@ -26,6 +26,11 @@ class PostgresShadowRepository {
     return result.rows[0] || run;
   }
 
+  async getShadowRunByIdempotencyKey(tenantId, idempotencyKey) {
+    const result = await this.client.query("/* readonly shadow run idempotency placeholder */", [tenantId, idempotencyKey]);
+    return result.rows[0] || null;
+  }
+
   async updateShadowRunStatus(runId, patch) {
     this.guard();
     const result = await this.client.query("/* update lead_scoring_shadow_runs placeholder */", [runId, patch]);
@@ -48,6 +53,11 @@ class PostgresShadowRepository {
     this.guard();
     await this.client.query("/* insert lead_scoring_shadow_explanations placeholder */", [explanations]);
     return explanations;
+  }
+
+  async getShadowExplanationsByResult(resultId) {
+    const result = await this.client.query("/* readonly shadow explanations placeholder */", [resultId]);
+    return result.rows;
   }
 
   async getShadowHistoryByLead(leadId) {

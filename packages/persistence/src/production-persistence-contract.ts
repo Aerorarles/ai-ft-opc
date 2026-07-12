@@ -80,6 +80,20 @@ const PROHIBITED_PERSISTENCE_FIELDS = Object.freeze([
  */
 
 /**
+ * M1-WP03 shadow persistence envelope. This is a local validation contract;
+ * it does not connect to PostgreSQL or execute the DRAFT migration.
+ *
+ * @typedef {Object} ShadowPersistenceEnvelope
+ * @property {PersistenceScope} scope
+ * @property {ScoringVersionAnchors} version_anchors
+ * @property {"shadow"} run_mode
+ * @property {Record<string, unknown>=} input_summary
+ * @property {Record<string, unknown>=} result_summary
+ * @property {Record<string, unknown>=} diff_summary
+ * @property {Record<string, unknown>[]=} explanations
+ */
+
+/**
  * @param {unknown} value
  * @returns {boolean}
  */
@@ -174,10 +188,44 @@ function validateIntakePersistenceEnvelope(candidate) {
   return { valid: errors.length === 0, errors };
 }
 
+/**
+ * @param {unknown} candidate
+ * @returns {{ valid: boolean, errors: string[] }}
+ */
+function validateShadowPersistenceEnvelope(candidate) {
+  /** @type {string[]} */
+  const errors = [];
+  const envelope = /** @type {Partial<ShadowPersistenceEnvelope>} */ (candidate || {});
+  const scope = envelope.scope || {};
+  const anchors = envelope.version_anchors || {};
+
+  validateScope(scope, errors);
+  for (const key of [
+    "config_version_id",
+    "config_checksum",
+    "engine_version",
+    "outcome_policy_id",
+    "outcome_policy_version",
+    "outcome_policy_checksum",
+  ]) {
+    if (!isNonEmptyString(anchors[key])) errors.push(`missing_shadow_version_anchor:${key}`);
+  }
+  if (envelope.run_mode !== "shadow") errors.push("shadow_run_mode_required");
+  appendProhibitedKeyErrors([
+    envelope.input_summary,
+    envelope.result_summary,
+    envelope.diff_summary,
+    ...(Array.isArray(envelope.explanations) ? envelope.explanations : []),
+  ], errors);
+
+  return { valid: errors.length === 0, errors };
+}
+
 module.exports = {
   PRODUCTION_PERSISTENCE_CONTRACT_VERSION,
   LOGICAL_PERSISTENCE_ENTITIES,
   PROHIBITED_PERSISTENCE_FIELDS,
   validatePersistenceContractEnvelope,
   validateIntakePersistenceEnvelope,
+  validateShadowPersistenceEnvelope,
 };
