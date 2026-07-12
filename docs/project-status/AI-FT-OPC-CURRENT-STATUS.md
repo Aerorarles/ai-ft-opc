@@ -5,6 +5,7 @@
 <!-- 2026-07-12: PR #8 was merged by the user. M1-WP07 Migration Draft Review Package is IN_PROGRESS; no database preflight or migration execution is authorized. -->
 <!-- 2026-07-12: M1-WP07 is READY_FOR_REVIEW. Database preflight, migration execution, and M1 exit actions remain unapproved. -->
 <!-- 2026-07-12: PR #9 was merged by the user. M1 exit review is READY_FOR_REVIEW; M1 remains IN_PROGRESS because controlled production persistence is not approved or implemented. -->
+<!-- 2026-07-12: M1 exit review PR #10 is open and GitHub Actions CI PASSED. -->
 
 ## Current Control Snapshot
 

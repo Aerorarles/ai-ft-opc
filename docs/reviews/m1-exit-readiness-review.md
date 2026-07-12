@@ -1,5 +1,7 @@
 # M1 Exit Readiness Review
 
+<!-- 2026-07-12: PR #10 GitHub Actions CI PASSED. The review does not approve database preflight or migration execution. -->
+
 版本：v1.0
 日期：2026-07-12
 状态：READY_FOR_REVIEW

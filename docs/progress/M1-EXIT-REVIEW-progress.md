@@ -1,5 +1,7 @@
 # M1 Exit Review Progress Report
 
+<!-- 2026-07-12: PR #10 is open and GitHub Actions CI PASSED. M1 remains IN_PROGRESS pending separate database preflight approval. -->
+
 版本：v1.0
 日期：2026-07-12
 状态：READY_FOR_REVIEW

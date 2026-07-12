@@ -29,4 +29,8 @@ work_package:
   next_work_package_name: M2 Controlled Workflow Runtime Planning
   next_work_package_requires_explicit_user_approval: true
   review_gate:
+    pull_request:
+      number: 10
+      url: https://github.com/Aerorarles/ai-ft-opc/pull/10
+      ci_status: PASSED
     required_action: User decision on separate database preflight approval. M1 remains IN_PROGRESS until controlled production persistence is approved and implemented.

@@ -6,6 +6,7 @@
 <!-- 2026-07-12: M1-WP07 is READY_FOR_REVIEW. Do not connect to a database, execute migration SQL, or begin M1 exit actions without explicit user approval. -->
 <!-- 2026-07-12: M1-WP07 PR #9 is open and GitHub Actions CI PASSED. -->
 <!-- 2026-07-12: PR #9 was merged by the user. M1-EXIT-REVIEW is READY_FOR_REVIEW; M1 remains IN_PROGRESS pending separate controlled production persistence approval. -->
+<!-- 2026-07-12: M1 exit review PR #10 is open and GitHub Actions CI PASSED. -->
 
 ## M1-WP06 Control Snapshot
 
