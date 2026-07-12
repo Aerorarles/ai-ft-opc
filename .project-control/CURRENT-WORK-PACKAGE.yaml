@@ -1,17 +1,16 @@
 work_package:
-  id: M1-EXIT-REVIEW
-  name: M1 Exit and Controlled Implementation Approval Review
-  status: READY_FOR_REVIEW
+  id: M1-DB-READONLY-PREFLIGHT
+  name: M1 Restricted Database Read-only Preflight
+  status: BLOCKED
   started_at: "2026-07-12"
   allowed_scope:
-    - create_m1_exit_readiness_review
-    - reconcile_project_control_and_current_status
-    - define_database_preflight_approval_requirements
-    - define_migration_execution_approval_requirements
-    - create_local_only_progress_and_review_docs
+    - read_only_database_schema_metadata
+    - read_only_extension_constraint_index_permission_metadata
+    - create_preflight_report_without_business_data
+    - update_project_control_status_and_progress
   forbidden_scope:
-    - database_connection
-    - database_preflight_execution
+    - read_config_or_env_or_credentials
+    - business_data_read
     - database_write
     - migration_execution
     - production_schema_change
@@ -21,16 +20,13 @@ work_package:
     - force_push
     - automatic_merge
   predecessor:
-    id: M1-WP07
-    name: Migration Draft Review Package
+    id: M1-EXIT-REVIEW
+    name: M1 Exit and Controlled Implementation Approval Review
     status: PASSED
-    evidence: PR #9 merged to main by the user.
-  next_work_package: M2-PLANNING
-  next_work_package_name: M2 Controlled Workflow Runtime Planning
-  next_work_package_requires_explicit_user_approval: true
+    evidence: PR #10 merged to main by the user.
+  blocking_condition: No local PostgreSQL read-only client or preconfigured non-secret connection entry is available. No database connection was attempted.
+  next_work_package: M1-DB-READONLY-PREFLIGHT
+  next_work_package_name: Resume restricted read-only database preflight
+  next_work_package_requires_explicit_user_approval: false
   review_gate:
-    pull_request:
-      number: 10
-      url: https://github.com/Aerorarles/ai-ft-opc/pull/10
-      ci_status: PASSED
-    required_action: User decision on separate database preflight approval. M1 remains IN_PROGRESS until controlled production persistence is approved and implemented.
+    required_action: Human provides an approved PostgreSQL client entry point with read-only access, without exposing credentials in this repository or chat.

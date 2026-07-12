@@ -5,14 +5,14 @@
 <!-- 2026-07-12: PR #8 was merged by the user. M1-WP07 Migration Draft Review Package is IN_PROGRESS; no database preflight or migration execution is authorized. -->
 <!-- 2026-07-12: M1-WP07 is READY_FOR_REVIEW. Database preflight, migration execution, and M1 exit actions remain unapproved. -->
 <!-- 2026-07-12: PR #9 was merged by the user. M1 exit review is READY_FOR_REVIEW; M1 remains IN_PROGRESS because controlled production persistence is not approved or implemented. -->
-<!-- 2026-07-12: M1 exit review PR #10 is open and GitHub Actions CI PASSED. -->
+<!-- 2026-07-12: PR #10 was merged by the user. The user approved a restricted database read-only preflight, but it is BLOCKED because no local PostgreSQL client or approved non-secret connection entry point is available. -->
 
 ## Current Control Snapshot
 
 - Current Milestone: M1 - Production Data Foundation, still IN_PROGRESS.
-- Current Work Package: M1-EXIT-REVIEW - Controlled Implementation Approval Review, READY_FOR_REVIEW.
-- Completed evidence: M1-WP01 through M1-WP07 were merged through PR #3 to PR #9.
-- Blocking gap: controlled production persistence has not been approved or implemented; no database preflight or migration has run.
+- Current Work Package: M1-DB-READONLY-PREFLIGHT, BLOCKED.
+- Completed evidence: M1-WP01 through M1-WP07 and M1 Exit Review were merged through PR #3 to PR #10.
+- Blocking gap: no local PostgreSQL client or approved non-secret connection entry point is available; no database preflight or migration has run.
 - Safety boundary: local memory and draft-only artifacts; no database, SQL execution, n8n, Docker, server, or real outreach action.
 
 版本：M1-WP05 v1.0

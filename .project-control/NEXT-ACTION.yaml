@@ -1,15 +1,15 @@
 next_action:
-  type: WAIT_FOR_REVIEW
-  target: M1-EXIT-REVIEW
-  reason: M1 local contracts and draft review are complete, but the M1 exit gate requires separately approved controlled production persistence. Database preflight and migration execution are not authorized.
-  required_actor: user_and_second_layer_reviewer
+  type: STOP
+  target: M1-DB-READONLY-PREFLIGHT
+  reason: User approved a restricted read-only database preflight, but no local PostgreSQL client or approved non-secret connection entry point is available. Do not guess connection parameters or read .env files.
+  required_actor: user_or_environment_admin
   blocking: true
   updated_at: "2026-07-12"
-  prohibited_until_approved:
-    - database_connection
-    - database_preflight_execution
+  prohibited_until_resolved:
+    - read_config_or_env_or_credentials
+    - database_connection_without_approved_client_entry
+    - business_data_read
     - migration_execution
     - production_database_write
     - production_n8n_activation
     - real_outreach
-    - M2_execution_without_explicit_user_approval
