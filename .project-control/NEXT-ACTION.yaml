@@ -1,14 +1,15 @@
 next_action:
   type: WAIT_FOR_REVIEW
-  target: M1-WP07
-  reason: M1-WP07 SQL draft review package is complete and awaits CI, second-layer review, and user approval. Database preflight and migration execution remain prohibited.
-  required_actor: ChatGPT_and_user
+  target: M1-EXIT-REVIEW
+  reason: M1 local contracts and draft review are complete, but the M1 exit gate requires separately approved controlled production persistence. Database preflight and migration execution are not authorized.
+  required_actor: user_and_second_layer_reviewer
   blocking: true
   updated_at: "2026-07-12"
   prohibited_until_approved:
     - database_connection
+    - database_preflight_execution
     - migration_execution
     - production_database_write
     - production_n8n_activation
     - real_outreach
-    - M1_exit_or_database_preflight_without_explicit_user_approval
+    - M2_execution_without_explicit_user_approval

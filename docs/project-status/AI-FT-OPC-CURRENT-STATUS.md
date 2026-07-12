@@ -4,14 +4,16 @@
 <!-- 2026-07-12: M1-WP06 PR #8 is open and GitHub Actions CI PASSED. -->
 <!-- 2026-07-12: PR #8 was merged by the user. M1-WP07 Migration Draft Review Package is IN_PROGRESS; no database preflight or migration execution is authorized. -->
 <!-- 2026-07-12: M1-WP07 is READY_FOR_REVIEW. Database preflight, migration execution, and M1 exit actions remain unapproved. -->
-<!-- 2026-07-12: M1-WP07 PR #9 is open and GitHub Actions CI PASSED. -->
+<!-- 2026-07-12: PR #9 was merged by the user. M1 exit review is READY_FOR_REVIEW; M1 remains IN_PROGRESS because controlled production persistence is not approved or implemented. -->
+<!-- 2026-07-12: M1 exit review PR #10 is open and GitHub Actions CI PASSED. -->
 
 ## Current Control Snapshot
 
-- Current Work Package: M1-WP06 - Idempotency & Replay Safety.
-- Status: READY_FOR_REVIEW after local validation; PR and CI remain pending.
-- Next package: M1-WP07 requires explicit user approval.
-- Safety boundary: local memory only; no database, SQL migration, n8n, Docker, server, or real outreach action.
+- Current Milestone: M1 - Production Data Foundation, still IN_PROGRESS.
+- Current Work Package: M1-EXIT-REVIEW - Controlled Implementation Approval Review, READY_FOR_REVIEW.
+- Completed evidence: M1-WP01 through M1-WP07 were merged through PR #3 to PR #9.
+- Blocking gap: controlled production persistence has not been approved or implemented; no database preflight or migration has run.
+- Safety boundary: local memory and draft-only artifacts; no database, SQL execution, n8n, Docker, server, or real outreach action.
 
 版本：M1-WP05 v1.0
 日期：2026-07-11
