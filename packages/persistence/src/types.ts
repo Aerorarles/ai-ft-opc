@@ -7,12 +7,13 @@
  * @typedef {import("../../phase2-domain/src/types.ts").ShadowDiff} ShadowDiff
  * @typedef {import("../../phase2-domain/src/types.ts").ShadowExplanation} ShadowExplanation
  * @typedef {import("../../phase2-domain/src/types.ts").ReviewQueueItem} ReviewQueueItem
+ * @typedef {import("../../phase2-domain/src/types.ts").ReviewDecision} ReviewDecision
  */
 
 /**
  * @typedef {{ limit?: number }} LeadListQuery
  * @typedef {{ status?: string }} ReviewQueueFilters
- * @typedef {{ review_status: "approved" | "rejected" | "skipped", review_notes?: string }} ReviewDecisionPatch
+ * @typedef {{ review_status: "approved" | "rejected" | "skipped", review_notes?: string, reviewed_by?: string }} ReviewDecisionPatch
  */
 
 /**

@@ -94,6 +94,16 @@ const PROHIBITED_PERSISTENCE_FIELDS = Object.freeze([
  */
 
 /**
+ * M1-WP04 review persistence envelope. This remains a local validation
+ * contract and does not connect to PostgreSQL or execute DRAFT-006.
+ *
+ * @typedef {Object} ReviewPersistenceEnvelope
+ * @property {PersistenceScope} scope
+ * @property {{ review_item_id: string, lead_id: string, shadow_result_id: string, review_status: string }} review_item
+ * @property {{ decision: string, decided_by: string, decision_notes_summary?: string | null }=} decision
+ */
+
+/**
  * @param {unknown} value
  * @returns {boolean}
  */
@@ -221,6 +231,44 @@ function validateShadowPersistenceEnvelope(candidate) {
   return { valid: errors.length === 0, errors };
 }
 
+/**
+ * @param {unknown} candidate
+ * @returns {{ valid: boolean, errors: string[] }}
+ */
+function validateReviewPersistenceEnvelope(candidate) {
+  /** @type {string[]} */
+  const errors = [];
+  const envelope = /** @type {Partial<ReviewPersistenceEnvelope>} */ (candidate || {});
+  const scope = envelope.scope || {};
+  const item = envelope.review_item || {};
+  const decision = envelope.decision;
+  const validStatuses = ["pending", "approved", "rejected", "skipped"];
+  const terminalStatuses = ["approved", "rejected", "skipped"];
+
+  validateScope(scope, errors);
+  for (const key of ["review_item_id", "lead_id", "shadow_result_id"]) {
+    if (!isNonEmptyString(item[key])) errors.push(`missing_review_item:${key}`);
+  }
+  if (!validStatuses.includes(String(item.review_status || ""))) errors.push("invalid_review_status");
+  if (decision) {
+    if (!terminalStatuses.includes(String(decision.decision || ""))) errors.push("invalid_review_decision");
+    if (!isNonEmptyString(decision.decided_by)) errors.push("missing_reviewer_identity");
+    if (decision.decision !== item.review_status) errors.push("review_status_decision_mismatch");
+    if (
+      decision.decision_notes_summary !== undefined &&
+      decision.decision_notes_summary !== null &&
+      !/^note_present\(length=\d+\)$/.test(String(decision.decision_notes_summary))
+    ) {
+      errors.push("invalid_review_note_summary");
+    }
+  } else if (item.review_status !== "pending") {
+    errors.push("terminal_review_requires_decision");
+  }
+  appendProhibitedKeyErrors([item, decision], errors);
+
+  return { valid: errors.length === 0, errors };
+}
+
 module.exports = {
   PRODUCTION_PERSISTENCE_CONTRACT_VERSION,
   LOGICAL_PERSISTENCE_ENTITIES,
@@ -228,4 +276,5 @@ module.exports = {
   validatePersistenceContractEnvelope,
   validateIntakePersistenceEnvelope,
   validateShadowPersistenceEnvelope,
+  validateReviewPersistenceEnvelope,
 };

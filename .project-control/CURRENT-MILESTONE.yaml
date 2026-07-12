@@ -12,5 +12,6 @@ milestone:
     - M0.5 is passed after PR #2 was merged to main by the user.
     - M1-WP01 Production Persistence Contract passed after PR #3 was merged to main by the user.
     - M1-WP02 Intake Persistence passed after PR #4 was merged to main by the user.
-    - M1-WP03 Shadow Scoring Persistence is implemented locally; PR #5 CI passed and second-layer review is pending.
+    - M1-WP03 Shadow Scoring Persistence passed after PR #5 was merged to main by the user.
+    - M1-WP04 Review Queue Persistence is explicitly approved and ready for review.
     - M1 does not authorize database write, migration execution, n8n activation, server change, or real outreach.

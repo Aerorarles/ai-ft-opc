@@ -2,7 +2,7 @@
 
 版本：v1.0
 日期：2026-07-11
-状态：READY_FOR_REVIEW
+状态：PASSED — PR #5 merged by user
 适用范围：Shadow Scoring Persistence（local memory only）。
 禁止事项：不连接数据库，不创建、修改或执行 SQL migration，不写 `public.leads`，不激活 n8n，不操作 Docker/服务器，不进行真实外联。
 
@@ -34,7 +34,7 @@
 
 ## 推荐下一步
 
-等待 M1-WP03 第二层审查。M1-WP04 Review Queue Persistence 与任何 SQL/migration、数据库写入、n8n、服务器或真实外联动作需要新的明确批准。
+M1-WP03 已通过。M1-WP04 Review Queue Persistence 已获得明确批准并进入第二层审查。
 
 ## 验收标准
 
@@ -50,4 +50,4 @@
 
 ## 下一步入口
 
-M1-WP03 READY_FOR_REVIEW。
+M1-WP03 PASSED。

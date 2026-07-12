@@ -112,17 +112,40 @@
  * @typedef {Object} ReviewQueueItem
  * @property {string} review_item_id
  * @property {string} lead_id
+ * @property {string} shadow_run_id
  * @property {string} shadow_result_id
+ * @property {string} tenant_id
+ * @property {string | null} organization_id
+ * @property {string | null} actor_user_id
+ * @property {string} request_trace_id
+ * @property {string} idempotency_key
  * @property {DecisionAction} decision_action
  * @property {number} decision_confidence
  * @property {string[]} decision_reasons
  * @property {string[]} risk_flags
  * @property {string} recommended_next_step
  * @property {ReviewStatus} review_status
+ * @property {string | null} assigned_to
+ * @property {string | null} reviewed_by
  * @property {string | null} review_notes
  * @property {string | null} reviewed_at
  * @property {string} created_at
  * @property {string} updated_at
+ */
+
+/**
+ * @typedef {Object} ReviewDecision
+ * @property {string} review_decision_id
+ * @property {string} review_item_id
+ * @property {string} lead_id
+ * @property {string} shadow_result_id
+ * @property {string} tenant_id
+ * @property {"approved" | "rejected" | "skipped"} decision
+ * @property {string | null} decision_notes_summary
+ * @property {string} decided_by
+ * @property {string} request_trace_id
+ * @property {string} idempotency_key
+ * @property {string} decided_at
  */
 
 module.exports = {};

@@ -28,6 +28,8 @@
  *   listReviewQueue(filters?: import("./types.ts").ReviewQueueFilters): Promise<import("./types.ts").ReviewQueueItem[]>,
  *   getReviewItem(id: string): Promise<import("./types.ts").ReviewQueueItem | null>,
  *   updateReviewDecision(id: string, decision: import("./types.ts").ReviewDecisionPatch): Promise<import("./types.ts").ReviewQueueItem>,
+ *   recordReviewDecision(reviewItemId: string, decision: import("./types.ts").ReviewDecision): Promise<{ item: import("./types.ts").ReviewQueueItem, decision: import("./types.ts").ReviewDecision, reused: boolean }>,
+ *   getReviewDecisionHistory(reviewItemId: string): Promise<import("./types.ts").ReviewDecision[]>,
  *   getReviewHistoryByLead(leadId: string): Promise<import("./types.ts").ReviewQueueItem[]>
  * }} ReviewRepository
  */
