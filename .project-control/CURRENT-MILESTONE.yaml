@@ -14,5 +14,6 @@ milestone:
     - M1-WP02 Intake Persistence passed after PR #4 was merged to main by the user.
     - M1-WP03 Shadow Scoring Persistence passed after PR #5 was merged to main by the user.
     - M1-WP04 Review Queue Persistence passed after PR #6 was merged to main by the user.
-    - M1-WP05 Audit Foundation is implemented locally; PR #7 is open and GitHub Actions CI passed. Second-layer review and user approval remain required.
+    - M1-WP05 Audit Foundation passed after PR #7 was merged to main by the user.
+    - M1-WP06 Idempotency & Replay Safety is implemented locally; PR #8 is open and GitHub Actions CI passed. Second-layer review and user approval remain required.
     - M1 does not authorize database write, migration execution, n8n activation, server change, or real outreach.

@@ -2,6 +2,7 @@
 
 const crypto = require("node:crypto");
 const { validateReviewPersistenceEnvelope } = require("../../persistence/src/production-persistence-contract.ts");
+const { validateIdempotencyReplayEnvelope } = require("../../persistence/src/idempotency-replay-safety.ts");
 
 /** @param {string} prefix */
 function createId(prefix) {
@@ -58,6 +59,14 @@ async function updateReviewStatus(reviewRepository, id, status, note = "") {
 async function recordReviewDecision(input) {
   const item = await input.reviewRepository.getReviewItem(input.review_item_id);
   if (!item) throw new Error(`review_item_not_found:${input.review_item_id}`);
+  const idempotencyValidation = validateIdempotencyReplayEnvelope({
+    tenant_id: item.tenant_id || "local",
+    request_trace_id: input.request_trace_id,
+    idempotency_key: input.idempotency_key,
+    operation: "review_action",
+    replay_behavior: "reuse_existing",
+  });
+  if (!idempotencyValidation.valid) throw new Error(`idempotency_contract_invalid:${idempotencyValidation.errors.join(",")}`);
   const now = new Date().toISOString();
   const decision = {
     review_decision_id: createId("review-decision"),

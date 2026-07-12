@@ -18,6 +18,13 @@ const {
   validateReviewPersistenceEnvelope,
   validateAuditPersistenceEnvelope,
 } = require("./production-persistence-contract.ts");
+const {
+  IDEMPOTENCY_OPERATIONS,
+  REPLAY_EVENT_ORDER,
+  buildIdempotencyKey,
+  validateIdempotencyReplayEnvelope,
+  auditReplaySafety,
+} = require("./idempotency-replay-safety.ts");
 
 module.exports = {
   MemoryLeadRepository,
@@ -37,4 +44,9 @@ module.exports = {
   validateShadowPersistenceEnvelope,
   validateReviewPersistenceEnvelope,
   validateAuditPersistenceEnvelope,
+  IDEMPOTENCY_OPERATIONS,
+  REPLAY_EVENT_ORDER,
+  buildIdempotencyKey,
+  validateIdempotencyReplayEnvelope,
+  auditReplaySafety,
 };

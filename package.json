@@ -18,7 +18,8 @@
     "test:m1-intake": "tsx apps/api-server/m1-intake-persistence-tests.ts",
     "test:m1-shadow": "tsx apps/api-server/m1-shadow-persistence-tests.ts",
     "test:m1-review": "tsx apps/api-server/m1-review-persistence-tests.ts",
-    "test:m1-audit": "tsx apps/api-server/m1-audit-foundation-tests.ts"
+    "test:m1-audit": "tsx apps/api-server/m1-audit-foundation-tests.ts",
+    "test:m1-idempotency": "tsx apps/api-server/m1-idempotency-replay-safety-tests.ts"
   },
   "dependencies": {
     "@types/node": "^24.0.8",

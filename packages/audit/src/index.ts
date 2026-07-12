@@ -2,6 +2,7 @@
 
 const { createHash } = require("node:crypto");
 const { validateAuditPersistenceEnvelope } = require("../../persistence/src/production-persistence-contract.ts");
+const { validateIdempotencyReplayEnvelope } = require("../../persistence/src/idempotency-replay-safety.ts");
 
 /** @param {string} prefix @param {unknown} value */
 function stableId(prefix, value) {
@@ -31,6 +32,14 @@ function stableId(prefix, value) {
  * }} input
  */
 async function appendAuditEvent(input) {
+  const idempotencyValidation = validateIdempotencyReplayEnvelope({
+    tenant_id: input.tenant_id,
+    request_trace_id: input.request_trace_id,
+    idempotency_key: input.idempotency_key,
+    operation: "audit_event",
+    replay_behavior: "audit_only",
+  });
+  if (!idempotencyValidation.valid) throw new Error(`idempotency_contract_invalid:${idempotencyValidation.errors.join(",")}`);
   const envelope = {
     scope: {
       tenant_id: input.tenant_id,
