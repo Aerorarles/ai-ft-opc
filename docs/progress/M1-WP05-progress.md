@@ -19,4 +19,9 @@
 
 ## 风险与下一步
 
+## Pull Request
+
+- PR #7 已创建：`feat(audit): add local M1 audit foundation`。
+- GitHub Actions CI 状态：PENDING；通过后仍需第二层审查和用户批准。
+
 仅内存，重启后审计事件丢失；无数据库事务、保留、RLS/RBAC 或不可篡改保证。等待 M1-WP05 审查；M1-WP06 Idempotency & Replay Safety 及任何数据库/SQL/n8n/服务器动作需要新的明确批准。
