@@ -46,4 +46,12 @@
  * }} IntakeRepository
  */
 
+/**
+ * @typedef {{
+ *   appendAuditEvent(event: import("./types.ts").AuditEvent): Promise<{ event: import("./types.ts").AuditEvent, reused: boolean }>,
+ *   getAuditEventsByTrace(requestTraceId: string): Promise<import("./types.ts").AuditEvent[]>,
+ *   getAuditEventsByEntity(entityType: string, entityId: string): Promise<import("./types.ts").AuditEvent[]>
+ * }} AuditRepository
+ */
+
 module.exports = {};
