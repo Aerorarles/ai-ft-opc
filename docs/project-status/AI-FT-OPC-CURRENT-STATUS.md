@@ -2,6 +2,9 @@
 
 <!-- 2026-07-12: M1-WP05 PR #7 was merged by the user. M1-WP06 Idempotency & Replay Safety is READY_FOR_REVIEW on a dedicated work branch. -->
 <!-- 2026-07-12: M1-WP06 PR #8 is open and GitHub Actions CI PASSED. -->
+<!-- 2026-07-12: PR #8 was merged by the user. M1-WP07 Migration Draft Review Package is IN_PROGRESS; no database preflight or migration execution is authorized. -->
+<!-- 2026-07-12: M1-WP07 is READY_FOR_REVIEW. Database preflight, migration execution, and M1 exit actions remain unapproved. -->
+<!-- 2026-07-12: M1-WP07 PR #9 is open and GitHub Actions CI PASSED. -->
 
 ## Current Control Snapshot
 
