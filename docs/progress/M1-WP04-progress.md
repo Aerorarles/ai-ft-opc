@@ -24,7 +24,7 @@
 ## Pull Request
 
 - PR #6 已创建：`feat(review): add local M1 review persistence`。
-- GitHub Actions CI 状态：PENDING；通过后仍需第二层审查和用户批准。
+- GitHub Actions CI 状态：PASSED；仍需第二层审查和用户批准。
 
 ## 已知限制
 
