@@ -21,6 +21,11 @@
 - `npm.cmd run phase2:test`：13 项通过。
 - `npm.cmd run test:m1-shadow`：6 项通过。
 
+## Pull Request
+
+- PR #6 已创建：`feat(review): add local M1 review persistence`。
+- GitHub Actions CI 状态：PENDING；通过后仍需第二层审查和用户批准。
+
 ## 已知限制
 
 - 仅内存，重启后 review item 与 decision history 丢失。

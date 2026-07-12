@@ -22,6 +22,11 @@
 - `test:m1-shadow`：6 项通过。
 - 所有验证仅使用本地 memory mode 与 mock Lead snapshot。
 
+## Pull Request 状态
+
+- PR #6：`feat(review): add local M1 review persistence`。
+- 当前 GitHub Actions CI：PENDING。CI 通过后仍需第二层审查与用户批准。
+
 ## 不变量检查
 
 - 终态只能从 pending 转入，不能用新幂等键重复决策。

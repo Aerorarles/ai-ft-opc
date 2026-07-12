@@ -29,4 +29,8 @@ work_package:
   next_work_package_name: Audit Foundation
   next_work_package_requires_explicit_user_approval: true
   review_gate:
+    pull_request:
+      number: 6
+      url: https://github.com/Aerorarles/ai-ft-opc/pull/6
+      ci_status: PENDING
     required_action: GitHub Actions CI, ChatGPT second-layer review, and user approval before M1-WP05.

@@ -80,4 +80,5 @@ ba0afb87e7daffdfb3f9e0f6ba5a8e9f59b9db39
 
 - M1-WP02 PR #4 已由用户合并到 main。
 - M1-WP03 PR #5 已由用户合并到 main。
-- M1-WP04 尚未创建 PR；不得自动合并，也不得在审查完成前开始 M1-WP05。
+- M1-WP04 的实现已提交至 PR #6，CI 状态为 PENDING。
+- 不得自动合并 PR，也不得在审查完成前开始 M1-WP05。
