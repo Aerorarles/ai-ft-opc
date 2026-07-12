@@ -32,5 +32,5 @@ work_package:
     pull_request:
       number: 7
       url: https://github.com/Aerorarles/ai-ft-opc/pull/7
-      ci_status: PENDING
+      ci_status: PASSED
     required_action: GitHub Actions CI, ChatGPT second-layer review, and user approval before M1-WP06.

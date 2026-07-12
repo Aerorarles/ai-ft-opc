@@ -1,5 +1,7 @@
 # AI FT-OPC Agent Start Here
 
+<!-- 2026-07-12: M1-WP05 PR #7 is open and GitHub Actions CI PASSED. Do not merge automatically or begin M1-WP06 without explicit user approval. -->
+
 ## 1. 必读顺序
 
 1. [AI-FT-OPC-MASTER-ARCHITECTURE-COMMERCIAL-ROADMAP-v1.0-LATEST.md](AI-FT-OPC-MASTER-ARCHITECTURE-COMMERCIAL-ROADMAP-v1.0-LATEST.md)

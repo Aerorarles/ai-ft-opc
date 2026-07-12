@@ -1,5 +1,7 @@
 # M1-WP05 Progress Report
 
+<!-- 2026-07-12: PR #7 GitHub Actions CI PASSED. M1-WP05 remains READY_FOR_REVIEW; second-layer review and explicit user approval remain required before M1-WP06. -->
+
 版本：v1.0
 日期：2026-07-12
 状态：READY_FOR_REVIEW

@@ -1,5 +1,7 @@
 # AI FT-OPC Current Status
 
+<!-- 2026-07-12: M1-WP05 Audit Foundation PR #7 is open and GitHub Actions CI PASSED. Status remains READY_FOR_REVIEW. -->
+
 版本：M1-WP05 v1.0
 日期：2026-07-11
 状态：CURRENT CONTROL STATE — READY_FOR_REVIEW
