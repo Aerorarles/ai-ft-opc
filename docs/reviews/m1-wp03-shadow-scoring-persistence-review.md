@@ -25,7 +25,7 @@
 ## Pull Request 状态
 
 - PR #5：`feat(shadow): add local M1 shadow persistence`。
-- 当前 GitHub Actions CI：PENDING。CI 通过后仍需第二层审查与用户批准。
+- 当前 GitHub Actions CI：PASSED。仍需第二层审查与用户批准。
 
 ## 不变量检查
 
