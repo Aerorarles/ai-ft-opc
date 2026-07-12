@@ -3,6 +3,7 @@
 const { scoreLeadAPI } = require("../../../scoring-engine/src/api/scoring-service.ts");
 const { decidePhase2Lead } = require("./decision-service.ts");
 const { validateShadowPersistenceEnvelope } = require("../../persistence/src/production-persistence-contract.ts");
+const { buildIdempotencyKey, validateIdempotencyReplayEnvelope } = require("../../persistence/src/idempotency-replay-safety.ts");
 
 /**
  * @param {string} prefix
@@ -91,7 +92,15 @@ async function runSingleLeadShadow(input) {
   const lead = input.leadSnapshot || await input.leadRepository.getLeadSnapshot(input.lead_id);
   if (!lead) throw new Error(`lead_snapshot_not_found:${input.lead_id}`);
   const tenantId = input.tenant_id || "local";
-  const idempotencyKey = input.idempotency_key || `shadow:${input.request_trace_id}:${lead.id}`;
+  const idempotencyKey = input.idempotency_key || buildIdempotencyKey({ operation: "shadow_run", request_trace_id: input.request_trace_id, entity_id: lead.id });
+  const idempotencyValidation = validateIdempotencyReplayEnvelope({
+    tenant_id: tenantId,
+    request_trace_id: input.request_trace_id,
+    idempotency_key: idempotencyKey,
+    operation: "shadow_run",
+    replay_behavior: "reuse_existing",
+  });
+  if (!idempotencyValidation.valid) throw new Error(`idempotency_contract_invalid:${idempotencyValidation.errors.join(",")}`);
   const existingRun = input.allow_shadow_write
     ? await input.shadowRepository.getShadowRunByIdempotencyKey(tenantId, idempotencyKey)
     : null;

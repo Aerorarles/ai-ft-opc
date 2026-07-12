@@ -1,19 +1,20 @@
 work_package:
-  id: M1-WP05
-  name: Audit Foundation
+  id: M1-WP06
+  name: Idempotency & Replay Safety
   status: READY_FOR_REVIEW
-  started_at: "2026-07-11"
+  started_at: "2026-07-12"
   allowed_scope:
-    - create_local_audit_event_contracts
-    - create_memory_audit_repository
-    - create_local_audit_tests
-    - create_audit_design_and_review_docs
+    - create_unified_local_idempotency_contracts
+    - add_local_audit_only_replay_safety_checks
+    - update_intake_shadow_review_audit_entry_validation
+    - create_local_tests_and_design_review_docs
     - update_project_control_status_and_progress
   forbidden_scope:
     - database_connection
     - database_write
     - migration_execution
     - sql_migration_creation
+    - production_replay_execution
     - n8n_or_docker_or_server_change
     - public_leads_v01_modification
     - real_outreach
@@ -21,16 +22,12 @@ work_package:
     - force_push
     - automatic_merge
   predecessor:
-    id: M1-WP04
-    name: Review Queue Persistence
+    id: M1-WP05
+    name: Audit Foundation
     status: PASSED
-    evidence: PR #6 merged by the user.
-  next_work_package: M1-WP06
-  next_work_package_name: Idempotency & Replay Safety
+    evidence: PR #7 merged to main by the user.
+  next_work_package: M1-WP07
+  next_work_package_name: Migration Draft Review Package
   next_work_package_requires_explicit_user_approval: true
   review_gate:
-    pull_request:
-      number: 7
-      url: https://github.com/Aerorarles/ai-ft-opc/pull/7
-      ci_status: PASSED
-    required_action: GitHub Actions CI, ChatGPT second-layer review, and user approval before M1-WP06.
+    required_action: GitHub Actions CI, second-layer review, and user approval before M1-WP07.

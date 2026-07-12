@@ -3,6 +3,7 @@
 const { createHash } = require("node:crypto");
 const { normalizeLead } = require("../../ingestion/src/index.ts");
 const { validateIntakePersistenceEnvelope } = require("../../persistence/src/production-persistence-contract.ts");
+const { validateIdempotencyReplayEnvelope } = require("../../persistence/src/idempotency-replay-safety.ts");
 
 const NORMALIZATION_VERSION = "phase1-normalization-v1";
 const DEDUPLICATION_VERSION = "m1-wp02-not-evaluated-v1";
@@ -68,6 +69,14 @@ async function persistIntakeSubmission(input) {
   };
   const validation = validateIntakePersistenceEnvelope(envelope);
   if (!validation.valid) throw new Error(`intake_contract_invalid:${validation.errors.join(",")}`);
+  const idempotencyValidation = validateIdempotencyReplayEnvelope({
+    tenant_id: input.tenant_id,
+    request_trace_id: input.request_trace_id,
+    idempotency_key: input.idempotency_key,
+    operation: "intake_submission",
+    replay_behavior: "reuse_existing",
+  });
+  if (!idempotencyValidation.valid) throw new Error(`idempotency_contract_invalid:${idempotencyValidation.errors.join(",")}`);
 
   const existing = await input.repository.getIntakeRunByIdempotencyKey(input.tenant_id, input.idempotency_key);
   if (existing) {

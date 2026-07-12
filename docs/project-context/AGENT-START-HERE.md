@@ -1,6 +1,12 @@
 # AI FT-OPC Agent Start Here
 
-<!-- 2026-07-12: M1-WP05 PR #7 is open and GitHub Actions CI PASSED. Do not merge automatically or begin M1-WP06 without explicit user approval. -->
+<!-- 2026-07-12: PR #7 was merged by the user. M1-WP06 Idempotency & Replay Safety is READY_FOR_REVIEW. Do not begin M1-WP07 without explicit user approval. -->
+
+## M1-WP06 Control Snapshot
+
+- 当前工作包：M1-WP06 Idempotency & Replay Safety，状态为 READY_FOR_REVIEW。
+- 当前范围：本地 memory 幂等与 audit-only replay safety；不执行生产 replay。
+- 下一工作包：M1-WP07 需要用户明确批准。
 
 ## 1. 必读顺序
 

@@ -1,6 +1,13 @@
 # AI FT-OPC Current Status
 
-<!-- 2026-07-12: M1-WP05 Audit Foundation PR #7 is open and GitHub Actions CI PASSED. Status remains READY_FOR_REVIEW. -->
+<!-- 2026-07-12: M1-WP05 PR #7 was merged by the user. M1-WP06 Idempotency & Replay Safety is READY_FOR_REVIEW on a dedicated work branch. -->
+
+## Current Control Snapshot
+
+- Current Work Package: M1-WP06 - Idempotency & Replay Safety.
+- Status: READY_FOR_REVIEW after local validation; PR and CI remain pending.
+- Next package: M1-WP07 requires explicit user approval.
+- Safety boundary: local memory only; no database, SQL migration, n8n, Docker, server, or real outreach action.
 
 版本：M1-WP05 v1.0
 日期：2026-07-11
