@@ -1,6 +1,6 @@
 // @ts-check
 
-const { runSingleLeadShadow } = require("../../packages/phase2-domain/src/index.ts");
+const { runSingleLeadShadow, recordReviewDecision } = require("../../packages/phase2-domain/src/index.ts");
 
 function json(status, body) {
   return { status, json: { mode: "local_mvp", ...body } };
@@ -57,11 +57,16 @@ function createPhase2Api(repositories) {
     const reviewAction = path.match(/^\/api\/review-queue\/([^/]+)\/(approve|reject|skip)$/);
     if (upper === "POST" && reviewAction) {
       const statusMap: Record<string, string> = { approve: "approved", reject: "rejected", skip: "skipped" };
-      const item = await repositories.reviewRepository.updateReviewDecision(reviewAction[1], {
+      const result = await recordReviewDecision({
+        reviewRepository: repositories.reviewRepository,
+        review_item_id: reviewAction[1],
         review_status: statusMap[reviewAction[2]],
-        review_notes: String(payload.note || ""),
+        reviewer_id: String(payload.reviewer_id || "local-operator"),
+        request_trace_id: String(payload.request_trace_id || `review:${reviewAction[1]}`),
+        idempotency_key: String(payload.idempotency_key || `review:${reviewAction[1]}:${reviewAction[2]}`),
+        review_note: String(payload.note || ""),
       });
-      return json(200, { item });
+      return json(200, result);
     }
     return json(404, { error: "not_found" });
   }

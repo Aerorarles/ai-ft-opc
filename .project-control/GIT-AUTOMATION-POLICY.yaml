@@ -34,5 +34,5 @@ git_automation:
     - unexpected_staged_file
     - secret_or_credential_risk
     - scope_expansion_required
-  current_branch: codex/m1-wp03-shadow-scoring-persistence
-  current_work_package: M1-WP03
+  current_branch: codex/m1-wp04-review-queue-persistence
+  current_work_package: M1-WP04

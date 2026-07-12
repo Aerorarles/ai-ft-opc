@@ -43,6 +43,17 @@ class PostgresReviewRepository {
     return result.rows[0];
   }
 
+  async recordReviewDecision(reviewItemId, decision) {
+    this.guard();
+    const result = await this.client.query("/* append lead_review_decisions placeholder */", [reviewItemId, decision]);
+    return result.rows[0] || { item: null, decision, reused: false };
+  }
+
+  async getReviewDecisionHistory(reviewItemId) {
+    const result = await this.client.query("/* readonly review decisions placeholder */", [reviewItemId]);
+    return result.rows;
+  }
+
   async getReviewHistoryByLead(leadId) {
     const result = await this.client.query("/* readonly review history placeholder */", [leadId]);
     return result.rows;

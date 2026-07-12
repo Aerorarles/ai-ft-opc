@@ -1,13 +1,13 @@
 work_package:
-  id: M1-WP03
-  name: Shadow Scoring Persistence
+  id: M1-WP04
+  name: Review Queue Persistence
   status: READY_FOR_REVIEW
   started_at: "2026-07-11"
   allowed_scope:
-    - create_local_shadow_persistence_contracts
-    - extend_memory_shadow_repository_and_idempotency
-    - create_local_shadow_persistence_tests
-    - create_shadow_design_and_review_docs
+    - create_local_review_persistence_contracts
+    - extend_memory_review_repository_and_audit
+    - create_local_review_persistence_tests
+    - create_review_design_and_review_docs
     - update_project_control_status_and_progress
   forbidden_scope:
     - database_connection
@@ -21,16 +21,16 @@ work_package:
     - force_push
     - automatic_merge
   predecessor:
-    id: M1-WP02
-    name: Intake Persistence
+    id: M1-WP03
+    name: Shadow Scoring Persistence
     status: PASSED
-    evidence: PR #4 merged by the user.
-  next_work_package: M1-WP04
-  next_work_package_name: Review Queue Persistence
+    evidence: PR #5 merged by the user.
+  next_work_package: M1-WP05
+  next_work_package_name: Audit Foundation
   next_work_package_requires_explicit_user_approval: true
   review_gate:
     pull_request:
-      number: 5
-      url: https://github.com/Aerorarles/ai-ft-opc/pull/5
+      number: 6
+      url: https://github.com/Aerorarles/ai-ft-opc/pull/6
       ci_status: PASSED
-    required_action: GitHub Actions CI, ChatGPT second-layer review, and user approval before M1-WP04.
+    required_action: GitHub Actions CI, ChatGPT second-layer review, and user approval before M1-WP05.
