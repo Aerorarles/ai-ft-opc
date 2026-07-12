@@ -1,13 +1,14 @@
 next_action:
   type: WAIT_FOR_REVIEW
-  target: M1-WP06
-  reason: M1-WP06 local idempotency and audit-only replay safety implementation is complete and awaits CI, second-layer review, and user approval.
+  target: M1-WP07
+  reason: M1-WP07 SQL draft review package is complete and awaits CI, second-layer review, and user approval. Database preflight and migration execution remain prohibited.
   required_actor: ChatGPT_and_user
   blocking: true
   updated_at: "2026-07-12"
   prohibited_until_approved:
-    - production_database_write
+    - database_connection
     - migration_execution
+    - production_database_write
     - production_n8n_activation
     - real_outreach
-    - M1-WP07_execution_without_explicit_user_approval
+    - M1_exit_or_database_preflight_without_explicit_user_approval
