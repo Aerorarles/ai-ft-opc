@@ -1,6 +1,7 @@
 # AI FT-OPC Agent Start Here
 
 <!-- 2026-07-12: PR #7 was merged by the user. M1-WP06 Idempotency & Replay Safety is READY_FOR_REVIEW. Do not begin M1-WP07 without explicit user approval. -->
+<!-- 2026-07-12: M1-WP06 PR #8 is open and GitHub Actions CI PASSED. -->
 
 ## M1-WP06 Control Snapshot
 

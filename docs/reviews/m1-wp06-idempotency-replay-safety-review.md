@@ -1,5 +1,7 @@
 # M1-WP06 Idempotency and Replay Safety Review Pack
 
+<!-- 2026-07-12: PR #8 GitHub Actions CI PASSED. Second-layer review and explicit user approval remain required before M1-WP07. -->
+
 版本：v1.0
 日期：2026-07-12
 状态：READY_FOR_REVIEW

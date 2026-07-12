@@ -1,6 +1,7 @@
 # AI FT-OPC Current Status
 
 <!-- 2026-07-12: M1-WP05 PR #7 was merged by the user. M1-WP06 Idempotency & Replay Safety is READY_FOR_REVIEW on a dedicated work branch. -->
+<!-- 2026-07-12: M1-WP06 PR #8 is open and GitHub Actions CI PASSED. -->
 
 ## Current Control Snapshot
 
