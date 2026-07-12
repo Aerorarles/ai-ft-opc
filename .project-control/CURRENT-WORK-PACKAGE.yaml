@@ -1,37 +1,32 @@
 work_package:
-  id: M1-WP07
-  name: Migration Draft Review Package
+  id: M1-EXIT-REVIEW
+  name: M1 Exit and Controlled Implementation Approval Review
   status: READY_FOR_REVIEW
   started_at: "2026-07-12"
   allowed_scope:
-    - create_non_executed_sql_draft
-    - create_static_sql_safety_tests
-    - create_migration_review_and_rollback_docs
-    - review_existing_draft_migration_alignment
-    - update_project_control_status_and_progress
+    - create_m1_exit_readiness_review
+    - reconcile_project_control_and_current_status
+    - define_database_preflight_approval_requirements
+    - define_migration_execution_approval_requirements
+    - create_local_only_progress_and_review_docs
   forbidden_scope:
     - database_connection
+    - database_preflight_execution
     - database_write
     - migration_execution
     - production_schema_change
-    - public_leads_v01_modification
-    - scoring_function_or_trigger_modification
     - n8n_or_docker_or_server_change
     - real_outreach
     - direct_push_main
     - force_push
     - automatic_merge
   predecessor:
-    id: M1-WP06
-    name: Idempotency & Replay Safety
+    id: M1-WP07
+    name: Migration Draft Review Package
     status: PASSED
-    evidence: PR #8 merged to main by the user.
-  next_work_package: M1-EXIT-REVIEW
-  next_work_package_name: M1 Exit and Controlled Implementation Approval Review
+    evidence: PR #9 merged to main by the user.
+  next_work_package: M2-PLANNING
+  next_work_package_name: M2 Controlled Workflow Runtime Planning
   next_work_package_requires_explicit_user_approval: true
   review_gate:
-    pull_request:
-      number: 9
-      url: https://github.com/Aerorarles/ai-ft-opc/pull/9
-      ci_status: PASSED
-    required_action: GitHub Actions CI, second-layer review, and user approval before any database preflight or M1 exit action.
+    required_action: User decision on separate database preflight approval. M1 remains IN_PROGRESS until controlled production persistence is approved and implemented.
