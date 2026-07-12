@@ -1,6 +1,8 @@
 # AI FT-OPC Current Status
 
-版本：M1-WP04 v1.0
+<!-- 2026-07-12: M1-WP05 Audit Foundation PR #7 is open and GitHub Actions CI PASSED. Status remains READY_FOR_REVIEW. -->
+
+版本：M1-WP05 v1.0
 日期：2026-07-11
 状态：CURRENT CONTROL STATE — READY_FOR_REVIEW
 适用范围：项目当前事实入口
@@ -12,11 +14,11 @@ M1 — Production Data Foundation
 
 ## Current Work Package
 
-M1-WP04 — Review Queue Persistence
+M1-WP05 — Audit Foundation
 
 ## Overall State
 
-M0 已完成基线冻结。M0.5-WP01-WP06 已完成，PR #2 已由用户合并到 main。M1-WP01 已通过 PR #3 合并到 main，M1-WP02 已通过 PR #4 合并到 main，M1-WP03 已通过 PR #5 合并到 main。M1-WP04 已在专用工作分支完成本地 Review Queue Persistence，等待 CI 与第二层审查；未连接数据库，未创建或执行 SQL migration。
+M0 已完成基线冻结。M0.5-WP01-WP06 已完成，PR #2 已由用户合并到 main。M1-WP01 至 M1-WP04 已分别通过 PR #3 至 PR #6 合并到 main。M1-WP05 已在专用工作分支完成本地 Audit Foundation，等待 CI 与第二层审查；未连接数据库，未创建或执行 SQL migration。
 
 ## Recently Completed
 

@@ -1,5 +1,7 @@
 # AI FT-OPC Agent Start Here
 
+<!-- 2026-07-12: M1-WP05 PR #7 is open and GitHub Actions CI PASSED. Do not merge automatically or begin M1-WP06 without explicit user approval. -->
+
 ## 1. 必读顺序
 
 1. [AI-FT-OPC-MASTER-ARCHITECTURE-COMMERCIAL-ROADMAP-v1.0-LATEST.md](AI-FT-OPC-MASTER-ARCHITECTURE-COMMERCIAL-ROADMAP-v1.0-LATEST.md)
@@ -12,14 +14,14 @@
 ## 2. 当前项目状态
 
 - 当前 Milestone：M1 — Production Data Foundation（IN_PROGRESS）。
-- 当前 Work Package：M1-WP04 — Review Queue Persistence（READY_FOR_REVIEW）。
+- 当前 Work Package：M1-WP05 — Audit Foundation（READY_FOR_REVIEW）。
 - 已确认资产：Lead Agent v0.1 生产事实、Lead Enrichment v0.1.7 已封存事实、Phase 1 + Phase 2 本地 MVP、v0.2-v0.7 scoring engine、本地 orchestration runtime、Phase 3 安全架构设计。
 - 当前允许：受限本地文档与项目控制面工作、已批准范围内的本地代码/测试工作、后续经批准的 M1 设计与草案准备。
 - 未经批准不得做：数据库 migration 或写入、Docker/服务器操作、n8n 发布或激活、批量 Enrichment、真实客户触达、Git 写操作、付费数据源真实查询。
 
 ## 3. 当前最高优先级
 
-M1-WP04 Review Queue Persistence：已完成本地 review item/decision 合约、reviewer identity、append-only audit、终态防重复与测试，等待第二层审查。不得连接数据库、执行 migration、写 `public.leads`、激活 n8n、操作服务器或开始 M1-WP05。
+M1-WP05 Audit Foundation：已完成本地跨 Intake/Shadow/Review audit contract、memory event store、trace/entity 查询与测试，等待第二层审查。不得连接数据库、执行 migration、写 `public.leads`、激活 n8n、操作服务器或开始 M1-WP06。
 
 ## 4. 核心架构
 
@@ -80,5 +82,5 @@ ba0afb87e7daffdfb3f9e0f6ba5a8e9f59b9db39
 
 - M1-WP02 PR #4 已由用户合并到 main。
 - M1-WP03 PR #5 已由用户合并到 main。
-- M1-WP04 的实现已提交至 PR #6，CI 状态为 PASSED。
-- 不得自动合并 PR，也不得在审查完成前开始 M1-WP05。
+- M1-WP04 PR #6 已由用户合并到 main。
+- M1-WP05 尚未创建 PR；不得自动合并，也不得在审查完成前开始 M1-WP06。

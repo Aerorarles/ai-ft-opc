@@ -11,6 +11,27 @@
  */
 
 /**
+ * @typedef {Object} AuditEvent
+ * @property {string} audit_event_id
+ * @property {string} tenant_id
+ * @property {string | null} organization_id
+ * @property {string | null} actor_user_id
+ * @property {string} request_trace_id
+ * @property {string} idempotency_key
+ * @property {"intake_completed" | "shadow_persisted" | "review_decided"} event_type
+ * @property {string} entity_type
+ * @property {string} entity_id
+ * @property {string | null} intake_run_id
+ * @property {string | null} shadow_run_id
+ * @property {string | null} shadow_result_id
+ * @property {string | null} review_item_id
+ * @property {string | null} review_decision_id
+ * @property {Record<string, unknown>} payload_summary
+ * @property {number} sequence_index
+ * @property {string} occurred_at
+ */
+
+/**
  * @typedef {{ limit?: number }} LeadListQuery
  * @typedef {{ status?: string }} ReviewQueueFilters
  * @typedef {{ review_status: "approved" | "rejected" | "skipped", review_notes?: string, reviewed_by?: string }} ReviewDecisionPatch

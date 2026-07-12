@@ -4,6 +4,7 @@ const { MemoryLeadRepository } = require("./memory/memory-lead-repository.ts");
 const { MemoryShadowRepository } = require("./memory/memory-shadow-repository.ts");
 const { MemoryReviewRepository } = require("./memory/memory-review-repository.ts");
 const { MemoryIntakeRepository } = require("./memory/memory-intake-repository.ts");
+const { MemoryAuditRepository } = require("./memory/memory-audit-repository.ts");
 const { PostgresLeadRepository } = require("./postgres/postgres-lead-repository.ts");
 const { PostgresShadowRepository } = require("./postgres/postgres-shadow-repository.ts");
 const { PostgresReviewRepository } = require("./postgres/postgres-review-repository.ts");
@@ -15,6 +16,7 @@ const {
   validatePersistenceContractEnvelope,
   validateShadowPersistenceEnvelope,
   validateReviewPersistenceEnvelope,
+  validateAuditPersistenceEnvelope,
 } = require("./production-persistence-contract.ts");
 
 module.exports = {
@@ -22,6 +24,7 @@ module.exports = {
   MemoryShadowRepository,
   MemoryReviewRepository,
   MemoryIntakeRepository,
+  MemoryAuditRepository,
   PostgresLeadRepository,
   PostgresShadowRepository,
   PostgresReviewRepository,
@@ -33,4 +36,5 @@ module.exports = {
   validatePersistenceContractEnvelope,
   validateShadowPersistenceEnvelope,
   validateReviewPersistenceEnvelope,
+  validateAuditPersistenceEnvelope,
 };

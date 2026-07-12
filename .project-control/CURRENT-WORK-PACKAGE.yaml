@@ -1,13 +1,13 @@
 work_package:
-  id: M1-WP04
-  name: Review Queue Persistence
+  id: M1-WP05
+  name: Audit Foundation
   status: READY_FOR_REVIEW
   started_at: "2026-07-11"
   allowed_scope:
-    - create_local_review_persistence_contracts
-    - extend_memory_review_repository_and_audit
-    - create_local_review_persistence_tests
-    - create_review_design_and_review_docs
+    - create_local_audit_event_contracts
+    - create_memory_audit_repository
+    - create_local_audit_tests
+    - create_audit_design_and_review_docs
     - update_project_control_status_and_progress
   forbidden_scope:
     - database_connection
@@ -21,16 +21,16 @@ work_package:
     - force_push
     - automatic_merge
   predecessor:
-    id: M1-WP03
-    name: Shadow Scoring Persistence
+    id: M1-WP04
+    name: Review Queue Persistence
     status: PASSED
-    evidence: PR #5 merged by the user.
-  next_work_package: M1-WP05
-  next_work_package_name: Audit Foundation
+    evidence: PR #6 merged by the user.
+  next_work_package: M1-WP06
+  next_work_package_name: Idempotency & Replay Safety
   next_work_package_requires_explicit_user_approval: true
   review_gate:
     pull_request:
-      number: 6
-      url: https://github.com/Aerorarles/ai-ft-opc/pull/6
+      number: 7
+      url: https://github.com/Aerorarles/ai-ft-opc/pull/7
       ci_status: PASSED
-    required_action: GitHub Actions CI, ChatGPT second-layer review, and user approval before M1-WP05.
+    required_action: GitHub Actions CI, ChatGPT second-layer review, and user approval before M1-WP06.

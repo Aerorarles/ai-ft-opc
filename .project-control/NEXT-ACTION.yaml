@@ -1,7 +1,7 @@
 next_action:
   type: WAIT_FOR_REVIEW
-  target: M1-WP04
-  reason: M1-WP04 local Review Queue Persistence, validation, and DRAFT-006 alignment review are complete; second-layer review is required before the next M1 Work Package.
+  target: M1-WP05
+  reason: M1-WP05 local Audit Foundation, validation, and retention/query boundary review are complete; second-layer review is required before the next M1 Work Package.
   required_actor: ChatGPT_and_user
   blocking: true
   updated_at: "2026-07-11"
@@ -10,6 +10,6 @@ next_action:
     - migration_execution
     - production_n8n_activation
     - real_outreach
-    - M1-WP05_execution_without_explicit_user_approval
+    - M1-WP06_execution_without_explicit_user_approval
     - production_database_write
     - migration_execution

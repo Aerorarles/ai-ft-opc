@@ -104,6 +104,15 @@ const PROHIBITED_PERSISTENCE_FIELDS = Object.freeze([
  */
 
 /**
+ * @typedef {Object} AuditPersistenceEnvelope
+ * @property {PersistenceScope} scope
+ * @property {string} event_type
+ * @property {string} entity_type
+ * @property {string} entity_id
+ * @property {Record<string, unknown>=} payload_summary
+ */
+
+/**
  * @param {unknown} value
  * @returns {boolean}
  */
@@ -269,6 +278,20 @@ function validateReviewPersistenceEnvelope(candidate) {
   return { valid: errors.length === 0, errors };
 }
 
+/** @param {unknown} candidate @returns {{ valid: boolean, errors: string[] }} */
+function validateAuditPersistenceEnvelope(candidate) {
+  /** @type {string[]} */
+  const errors = [];
+  const envelope = /** @type {Partial<AuditPersistenceEnvelope>} */ (candidate || {});
+  const eventTypes = ["intake_completed", "shadow_persisted", "review_decided"];
+  validateScope(envelope.scope || {}, errors);
+  if (!eventTypes.includes(String(envelope.event_type || ""))) errors.push("invalid_audit_event_type");
+  if (!isNonEmptyString(envelope.entity_type)) errors.push("missing_audit_entity_type");
+  if (!isNonEmptyString(envelope.entity_id)) errors.push("missing_audit_entity_id");
+  appendProhibitedKeyErrors([envelope.payload_summary], errors);
+  return { valid: errors.length === 0, errors };
+}
+
 module.exports = {
   PRODUCTION_PERSISTENCE_CONTRACT_VERSION,
   LOGICAL_PERSISTENCE_ENTITIES,
@@ -277,4 +300,5 @@ module.exports = {
   validateIntakePersistenceEnvelope,
   validateShadowPersistenceEnvelope,
   validateReviewPersistenceEnvelope,
+  validateAuditPersistenceEnvelope,
 };
