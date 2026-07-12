@@ -29,4 +29,8 @@ work_package:
   next_work_package_name: Resume restricted read-only database preflight
   next_work_package_requires_explicit_user_approval: false
   review_gate:
+    pull_request:
+      number: 11
+      url: https://github.com/Aerorarles/ai-ft-opc/pull/11
+      ci_status: PASSED
     required_action: Human provides an approved PostgreSQL client entry point with read-only access, without exposing credentials in this repository or chat.

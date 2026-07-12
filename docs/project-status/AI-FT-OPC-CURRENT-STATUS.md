@@ -6,6 +6,7 @@
 <!-- 2026-07-12: M1-WP07 is READY_FOR_REVIEW. Database preflight, migration execution, and M1 exit actions remain unapproved. -->
 <!-- 2026-07-12: PR #9 was merged by the user. M1 exit review is READY_FOR_REVIEW; M1 remains IN_PROGRESS because controlled production persistence is not approved or implemented. -->
 <!-- 2026-07-12: PR #10 was merged by the user. The user approved a restricted database read-only preflight, but it is BLOCKED because no local PostgreSQL client or approved non-secret connection entry point is available. -->
+<!-- 2026-07-12: M1 database preflight blocked-report PR #11 is open and GitHub Actions CI PASSED. -->
 
 ## Current Control Snapshot
 

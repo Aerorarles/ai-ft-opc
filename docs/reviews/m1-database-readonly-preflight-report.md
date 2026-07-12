@@ -1,5 +1,7 @@
 # M1 Restricted Database Read-only Preflight Report
 
+<!-- 2026-07-12: PR #11 GitHub Actions CI PASSED. No database connection was attempted; the client-entry prerequisite remains unresolved. -->
+
 版本：v1.0
 日期：2026-07-12
 状态：BLOCKED

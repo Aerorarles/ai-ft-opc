@@ -1,5 +1,7 @@
 # M1 Database Read-only Preflight Progress Report
 
+<!-- 2026-07-12: PR #11 is open and GitHub Actions CI PASSED. The work package remains BLOCKED pending an approved read-only PostgreSQL client entry point. -->
+
 版本：v1.0
 日期：2026-07-12
 状态：BLOCKED
