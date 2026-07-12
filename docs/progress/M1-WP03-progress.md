@@ -21,6 +21,11 @@
 - `npm.cmd run phase2:test`：13 项通过。
 - `npm.cmd run test:scoring`：54 项通过。
 
+## Pull Request
+
+- PR #5 已创建：`feat(shadow): add local M1 shadow persistence`。
+- GitHub Actions CI 状态：PENDING；通过后仍需第二层审查和用户批准。
+
 ## 已知限制
 
 - 仅内存，重启后 history 丢失。

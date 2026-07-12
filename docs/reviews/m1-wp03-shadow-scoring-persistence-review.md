@@ -22,6 +22,11 @@
 - `test:scoring`：54 项通过。
 - 所有验证仅使用本地 memory mode 与 mock lead snapshot。
 
+## Pull Request 状态
+
+- PR #5：`feat(shadow): add local M1 shadow persistence`。
+- 当前 GitHub Actions CI：PENDING。CI 通过后仍需第二层审查与用户批准。
+
 ## 不变量检查
 
 - v0.1 `score`、`grade`、`priority` 未被 shadow 执行改写。
