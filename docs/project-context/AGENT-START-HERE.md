@@ -1,100 +1,47 @@
 # AI FT-OPC Agent Start Here
 
-<!-- 2026-07-12: PR #7 was merged by the user. M1-WP06 Idempotency & Replay Safety is READY_FOR_REVIEW. Do not begin M1-WP07 without explicit user approval. -->
-<!-- 2026-07-12: M1-WP06 PR #8 is open and GitHub Actions CI PASSED. -->
-<!-- 2026-07-12: PR #8 was merged by the user. M1-WP07 Migration Draft Review Package is approved and IN_PROGRESS. Database preflight and migration execution remain prohibited. -->
-<!-- 2026-07-12: M1-WP07 is READY_FOR_REVIEW. Do not connect to a database, execute migration SQL, or begin M1 exit actions without explicit user approval. -->
-<!-- 2026-07-12: M1-WP07 PR #9 is open and GitHub Actions CI PASSED. -->
-<!-- 2026-07-12: PR #9 was merged by the user. M1-EXIT-REVIEW is READY_FOR_REVIEW; M1 remains IN_PROGRESS pending separate controlled production persistence approval. -->
-<!-- 2026-07-12: M1 exit review PR #10 is open and GitHub Actions CI PASSED. -->
-<!-- 2026-07-12: Restricted database read-only preflight is approved but BLOCKED locally: no PostgreSQL client or approved non-secret connection entry point is available. -->
-<!-- 2026-07-12: M1 database preflight blocked-report PR #11 is open and GitHub Actions CI PASSED. -->
-
-## M1-WP06 Control Snapshot
-
-- 当前工作包：M1-WP06 Idempotency & Replay Safety，状态为 READY_FOR_REVIEW。
-- 当前范围：本地 memory 幂等与 audit-only replay safety；不执行生产 replay。
-- 下一工作包：M1-WP07 需要用户明确批准。
+<!-- 2026-07-16: M1 进入两道门止损收尾；pgpass/只读身份已通过，当前等待候选列级 SELECT 权限批准。 -->
 
 ## 1. 必读顺序
 
 1. [AI-FT-OPC-MASTER-ARCHITECTURE-COMMERCIAL-ROADMAP-v1.0-LATEST.md](AI-FT-OPC-MASTER-ARCHITECTURE-COMMERCIAL-ROADMAP-v1.0-LATEST.md)
 2. [AI-FT-OPC-CURRENT-STATUS.md](../project-status/AI-FT-OPC-CURRENT-STATUS.md)
-3. 当前 Milestone / Work Package 文件
-4. 仅在需要历史实现细节时，再读取 project handover、architecture roadmap、master memory、Phase 3 设计及本次任务涉及的 workflow / SQL / docs / migration
+3. `.project-control/CURRENT-WORK-PACKAGE.yaml`
+4. `.project-control/NEXT-ACTION.yaml`
+5. 当前任务涉及的 progress、review、workflow、SQL 或 migration
 
-最新 master architecture 是当前最高主体架构约束；历史文件用于已发生事实、专项设计和验收记录，不得取代最新 master architecture。
+冲突时遵循：用户最新明确指令 → 最新 Master Architecture → 当前 Project Control/Execution Report → 历史文档。
 
-## 2. 当前项目状态
+## 2. 当前状态
 
-- 当前 Milestone：M1 — Production Data Foundation（IN_PROGRESS）。
-- 当前 Work Package：M1-WP05 — Audit Foundation（READY_FOR_REVIEW）。
-- 已确认资产：Lead Agent v0.1 生产事实、Lead Enrichment v0.1.7 已封存事实、Phase 1 + Phase 2 本地 MVP、v0.2-v0.7 scoring engine、本地 orchestration runtime、Phase 3 安全架构设计。
-- 当前允许：受限本地文档与项目控制面工作、已批准范围内的本地代码/测试工作、后续经批准的 M1 设计与草案准备。
-- 未经批准不得做：数据库 migration 或写入、Docker/服务器操作、n8n 发布或激活、批量 Enrichment、真实客户触达、Git 写操作、付费数据源真实查询。
+- Milestone：`M1 — Production Data Foundation / IN_PROGRESS`。
+- Work Package：`M1-CANDIDATE-READ-PERMISSION-GATE / REQUEST_APPROVAL`。
+- M1 Release Candidate 已执行一次；11 个 M1 表已完成元数据验证，migration 临时权限已回收。
+- 本地 no-review writer、固定 pg 8.x client adapter、严格请求 schema、hash/role 绑定、行数限制与 fake-client 测试已完成。
+- 旧 `UNSELECTED` 请求已失效，不能批准或复用。
 
 ## 3. 当前最高优先级
 
-M1-WP05 Audit Foundation：已完成本地跨 Intake/Shadow/Review audit contract、memory event store、trace/entity 查询与测试，等待第二层审查。不得连接数据库、执行 migration、写 `public.leads`、激活 n8n、操作服务器或开始 M1-WP06。
+pgpass 与 READ ONLY identity preflight 已通过。当前只允许请求 Owner 批准 `M1-CANDIDATE-READ-PERMISSION v1.0` 的精确列级 GRANT/REVOKE；未经批准不得授予权限或运行候选业务查询。
 
-## 4. 核心架构
+筛选前不得创建新请求；筛选后只为一个精确 Lead 和 `tenant_id=local` 生成新请求。该请求仍不是写入批准。
 
-ChatGPT：战略、架构、风险、验收；
-Codex：本地受限开发、静态审查、受限 Git；
-n8n：稳定业务流程执行；
-PostgreSQL：业务事实、状态、评分、审计；
-人工：审批、商业判断、客户关系、所有真实外部行为。
+## 4. 不可破坏的不变量
 
-## 5. 硬性安全边界
+- `public.leads` 与 v0.1 `score / grade / priority` 不得改变。
+- Shadow grade/priority diff 为 `not_evaluated`。
+- 单次最多 1 个 tenant、1 个 Lead、6 张 Shadow/Audit 表、10 行。
+- 不创建 Review Queue 或 Intake 数据。
+- 不读取/展示 `.env`、`pgpass`、密码、token、credentials、Cookie、备份或完整联系信息。
 
-- 不读取或提交配置环境文件、密钥、凭据或密码。
-- 未经明确批准，不运行数据库写入、migration、Docker、服务器命令、n8n 发布、Git 写操作。
-- 不自动邮件、WhatsApp、LinkedIn、表单提交、报价或任何真实客户触达。
-- 数据库变更必须先给 SQL、影响范围、回滚建议，并等待批准。
-- n8n 必须遵循：设计 → 静态审查 → inactive 导入 → 局部验证 → 回写前审查 → 单条验证 → 导出 JSON → 去除凭据 → Git 归档。
-- Git 只能精确暂存指定文件；禁止 git add .、git add -A、git commit -a、force push。
-- 出现冲突、远程分叉、工作树不干净或权限不确定时停止并报告。
+## 5. 未经独立批准不得执行
 
-## 6. 当前已封存版本
+- 真实 Lead 业务字段读取；
+- writer role、GRANT/REVOKE/LOGIN 或 adapter 启用；
+- 任何数据库写入、migration、清理或回滚；
+- n8n、Docker、服务器、付费 API、真实外联；
+- Git merge、rebase、reset 或 force push；本次收尾计划仅授权精确分支 commit、push 与 Draft PR。
 
-Lead Enrichment v0.1.7：
+## 6. 验收与停止条件
 
-workflows/n8n/lead-enrichment-v0.1.7-single-lead-test-contact-candidate-quality-hardening.json
-
-历史污染修正脚本：
-
-scripts/manual/fix-smurfit-westrock-enrichment-v0.1.7-history.sql
-
-归档提交：
-
-ba0afb87e7daffdfb3f9e0f6ba5a8e9f59b9db39
-
-## 7. 新 Agent 的标准启动动作
-
-阅读完成后，先输出：
-1. 当前项目阶段；
-2. 本次任务是否符合主体架构；
-3. 影响范围；
-4. 风险；
-5. 是否需要用户明确批准；
-6. 验收标准与回滚方式。
-
-未完成上述确认前，不得进行写操作。
-
-## 8. 更新规则
-
-每完成一个项目里程碑，只更新：
-- 当前阶段；
-- 已完成 / 已归档内容；
-- 当前 P0；
-- 当前允许与禁止事项；
-- 下一阶段入口。
-
-完整历史与长期路线保留在另外两份权威文档中。
-
-## 9. 当前审查状态
-
-- M1-WP02 PR #4 已由用户合并到 main。
-- M1-WP03 PR #5 已由用户合并到 main。
-- M1-WP04 PR #6 已由用户合并到 main。
-- M1-WP05 尚未创建 PR；不得自动合并，也不得在审查完成前开始 M1-WP06。
+只读候选阶段仅输出允许的候选摘要与 hash，最多 3 条。权限不足、对象/版本/hash 漂移、候选不合格、出现敏感字段或范围扩大时立即停止。任何未来写入必须重新获得绑定精确目标、版本、writer hash、六表范围、10 行上限和回滚负责人的批准。

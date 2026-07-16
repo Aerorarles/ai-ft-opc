@@ -1,15 +1,19 @@
 next_action:
-  type: STOP
-  target: M1-DB-READONLY-PREFLIGHT
-  reason: User approved a restricted read-only database preflight, but no local PostgreSQL client or approved non-secret connection entry point is available. Do not guess connection parameters or read .env files.
-  required_actor: user_or_environment_admin
+  type: REQUEST_APPROVAL
+  target: M1-CANDIDATE-READ-PERMISSION-GATE
+  reason: pgpass authentication and read-only identity pass. Candidate selection now requires the exact temporary column-level SELECT grant documented in M1-CANDIDATE-READ-PERMISSION-APPROVAL-REQUEST.md.
+  required_actor: owner_and_database_admin
   blocking: true
-  updated_at: "2026-07-12"
+  updated_at: "2026-07-16"
   prohibited_until_resolved:
     - read_config_or_env_or_credentials
-    - database_connection_without_approved_client_entry
-    - business_data_read
-    - migration_execution
-    - production_database_write
+    - inspect_or_modify_pgpass_or_credentials
+    - output_sensitive_business_fields
+    - database_write
+    - postgres_adapter_enablement
+    - unapproved_candidate_select_grant
+    - writer_role_grant_or_login_change
+    - public_leads_business_data_write
+    - review_queue_write
     - production_n8n_activation
     - real_outreach

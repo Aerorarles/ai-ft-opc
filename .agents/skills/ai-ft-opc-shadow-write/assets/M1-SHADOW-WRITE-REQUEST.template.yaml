@@ -1,0 +1,67 @@
+request:
+  id: "__REQUEST_ID__"
+  trace_id: "__TRACE_ID__"
+  idempotency_key: "__IDEMPOTENCY_KEY__"
+  status: "PENDING_APPROVAL"
+  created_at: "__CREATED_AT__"
+  expires_at: "__EXPIRES_AT__"
+
+candidate_selection:
+  evidence_hash: "__CANDIDATE_EVIDENCE_HASH__"
+  input_snapshot_hash: "__INPUT_SNAPSHOT_HASH__"
+  selected_from_live_read: true
+  exclusion_policy_version: "m1-shadow-candidate-v1"
+
+target:
+  tenant_id: "__TENANT_ID__"
+  lead_id: "__LEAD_ID__"
+  company_name: "__COMPANY_NAME__"
+
+versions:
+  config_version: "__CONFIG_VERSION__"
+  config_artifact_sha256: "__CONFIG_ARTIFACT_SHA256__"
+  config_checksum: "__CONFIG_CHECKSUM__"
+  engine_version: "__ENGINE_VERSION__"
+  outcome_policy: "not-configured"
+
+writer:
+  package_sha256: "__WRITER_PACKAGE_HASH__"
+  implementation: "single-lead-shadow-writer-v1"
+  database_role: "__WRITER_DATABASE_ROLE__"
+
+scope:
+  max_entities: 1
+  transaction_required: true
+  allowed_tables:
+    - "public.lead_operation_idempotency_claims"
+    - "public.lead_scoring_shadow_runs"
+    - "public.lead_scoring_shadow_results"
+    - "public.lead_scoring_shadow_diff"
+    - "public.lead_scoring_shadow_explanations"
+    - "public.lead_audit_events"
+  max_rows:
+    public.lead_operation_idempotency_claims: 1
+    public.lead_scoring_shadow_runs: 1
+    public.lead_scoring_shadow_results: 1
+    public.lead_scoring_shadow_diff: 1
+    public.lead_scoring_shadow_explanations: 5
+    public.lead_audit_events: 1
+  total_max_rows: 10
+
+prohibitions:
+  modify_public_leads: false
+  modify_v01_score_facts: false
+  create_review_queue_data: false
+  external_outreach: false
+  execute_migration: false
+  enable_writer: false
+
+approval:
+  required: true
+  approved_by: null
+  approved_at: null
+  approval_scope_hash: "__APPROVAL_SCOPE_HASH__"
+
+rollback:
+  owner: "__ROLLBACK_OWNER__"
+  mode: "transaction_or_separate_approval"

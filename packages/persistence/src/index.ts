@@ -8,6 +8,11 @@ const { MemoryAuditRepository } = require("./memory/memory-audit-repository.ts")
 const { PostgresLeadRepository } = require("./postgres/postgres-lead-repository.ts");
 const { PostgresShadowRepository } = require("./postgres/postgres-shadow-repository.ts");
 const { PostgresReviewRepository } = require("./postgres/postgres-review-repository.ts");
+const { executeApprovedSingleLeadShadowWrite } = require("./postgres/single-lead-shadow-writer.ts");
+const {
+  createLocalSingleLeadShadowClient,
+  executeApprovedSingleLeadShadowWriteLocally,
+} = require("./postgres/local-single-lead-shadow-client.ts");
 const { assertPostgresShadowWriteAllowed, DISABLED_MESSAGE } = require("./guards.ts");
 const {
   PRODUCTION_PERSISTENCE_CONTRACT_VERSION,
@@ -35,6 +40,9 @@ module.exports = {
   PostgresLeadRepository,
   PostgresShadowRepository,
   PostgresReviewRepository,
+  executeApprovedSingleLeadShadowWrite,
+  createLocalSingleLeadShadowClient,
+  executeApprovedSingleLeadShadowWriteLocally,
   assertPostgresShadowWriteAllowed,
   DISABLED_MESSAGE,
   PRODUCTION_PERSISTENCE_CONTRACT_VERSION,
