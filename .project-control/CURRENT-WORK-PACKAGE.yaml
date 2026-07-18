@@ -1,36 +1,44 @@
 work_package:
-  id: M1-DB-READONLY-PREFLIGHT
-  name: M1 Restricted Database Read-only Preflight
-  status: BLOCKED
-  started_at: "2026-07-12"
+  id: M1-CANDIDATE-READ-PERMISSION-GATE
+  name: M1 closeout gate 1 - bounded candidate read permission
+  status: REQUEST_APPROVAL
+  started_at: "2026-07-16"
+  approval:
+    status: PENDING_PERMISSION_EXPANSION_APPROVAL
+    approved_by: null
+    approved_at: null
+    evidence: docs/approvals/M1-CANDIDATE-READ-PERMISSION-APPROVAL-REQUEST.md
   allowed_scope:
-    - read_only_database_schema_metadata
-    - read_only_extension_constraint_index_permission_metadata
-    - create_preflight_report_without_business_data
-    - update_project_control_status_and_progress
+    - readonly_identity_and_transaction_preflight
+    - read_at_most_three_candidate_summaries
+    - compute_candidate_evidence_and_input_snapshot_hashes
+    - prepare_exact_column_level_grant_and_revoke_request
+    - update_candidate_selection_progress_and_project_control
   forbidden_scope:
     - read_config_or_env_or_credentials
-    - business_data_read
+    - output_full_email_phone_contact_notes_or_raw_data
     - database_write
-    - migration_execution
-    - production_schema_change
+    - postgres_adapter_enablement_or_execution
+    - writer_role_grant_or_login_change
+    - public_leads_business_data_write
+    - review_queue_or_intake_write
     - n8n_or_docker_or_server_change
     - real_outreach
-    - direct_push_main
-    - force_push
-    - automatic_merge
+    - git_write
   predecessor:
-    id: M1-EXIT-REVIEW
-    name: M1 Exit and Controlled Implementation Approval Review
-    status: PASSED
-    evidence: PR #10 merged to main by the user.
-  blocking_condition: No local PostgreSQL read-only client or preconfigured non-secret connection entry is available. No database connection was attempted.
-  next_work_package: M1-DB-READONLY-PREFLIGHT
-  next_work_package_name: Resume restricted read-only database preflight
-  next_work_package_requires_explicit_user_approval: false
-  review_gate:
-    pull_request:
-      number: 11
-      url: https://github.com/Aerorarles/ai-ft-opc/pull/11
-      ci_status: PASSED
-    required_action: Human provides an approved PostgreSQL client entry point with read-only access, without exposing credentials in this repository or chat.
+    id: M1-SHADOW-WRITER-HARDENING
+    status: PASSED_LOCAL_ONLY
+    evidence: Strict request validation, no-review writer, fake-client tests, and local review passed.
+  next_work_package: M1-SHADOW-WRITE-REQUEST
+  next_work_package_requires_explicit_user_approval: true
+  blocker:
+    code: READONLY_PERMISSION_DENIED
+    evidence: Local-user pgpass authentication and READ ONLY identity preflight pass, but the candidate compliance query is denied on its required table/column scope.
+    required_resolution: Owner approves the exact column-level GRANT/REVOKE request; database administrator applies it and records revocation evidence.
+  stop_conditions:
+    - permission_denied
+    - more_than_three_rows
+    - sensitive_output
+    - candidate_exclusion_uncertain
+    - missing_required_table_or_column
+    - database_write_or_scope_expansion_required

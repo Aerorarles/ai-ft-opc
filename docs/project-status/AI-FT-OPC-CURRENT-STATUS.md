@@ -1,98 +1,49 @@
 # AI FT-OPC Current Status
 
-<!-- 2026-07-12: M1-WP05 PR #7 was merged by the user. M1-WP06 Idempotency & Replay Safety is READY_FOR_REVIEW on a dedicated work branch. -->
-<!-- 2026-07-12: M1-WP06 PR #8 is open and GitHub Actions CI PASSED. -->
-<!-- 2026-07-12: PR #8 was merged by the user. M1-WP07 Migration Draft Review Package is IN_PROGRESS; no database preflight or migration execution is authorized. -->
-<!-- 2026-07-12: M1-WP07 is READY_FOR_REVIEW. Database preflight, migration execution, and M1 exit actions remain unapproved. -->
-<!-- 2026-07-12: PR #9 was merged by the user. M1 exit review is READY_FOR_REVIEW; M1 remains IN_PROGRESS because controlled production persistence is not approved or implemented. -->
-<!-- 2026-07-12: PR #10 was merged by the user. The user approved a restricted database read-only preflight, but it is BLOCKED because no local PostgreSQL client or approved non-secret connection entry point is available. -->
-<!-- 2026-07-12: M1 database preflight blocked-report PR #11 is open and GitHub Actions CI PASSED. -->
-
-## Current Control Snapshot
-
-- Current Milestone: M1 - Production Data Foundation, still IN_PROGRESS.
-- Current Work Package: M1-DB-READONLY-PREFLIGHT, BLOCKED.
-- Completed evidence: M1-WP01 through M1-WP07 and M1 Exit Review were merged through PR #3 to PR #10.
-- Blocking gap: no local PostgreSQL client or approved non-secret connection entry point is available; no database preflight or migration has run.
-- Safety boundary: local memory and draft-only artifacts; no database, SQL execution, n8n, Docker, server, or real outreach action.
-
-版本：M1-WP05 v1.0
-日期：2026-07-11
-状态：CURRENT CONTROL STATE — READY_FOR_REVIEW
-适用范围：项目当前事实入口
-禁止事项：本状态文件不授权数据库、n8n、Docker、服务器、Git 写操作或真实外联。
+版本：M1 Closeout v1.0
+日期：2026-07-16
+状态：`REQUEST_APPROVAL — M1-CANDIDATE-READ-PERMISSION-GATE`
 
 ## Current Milestone
 
-M1 — Production Data Foundation
+`M1 — Production Data Foundation / IN_PROGRESS`
+
+M1 Release Candidate 已受控执行并完成元数据复核：11 个 M1 表存在，约束与索引通过检查，`public.leads` 的 v0.1 Trigger 与正式评分事实未改变；migration 临时权限已回收。
+
+M1 现已进入止损收尾，只允许两道数据库门：候选列级只读权限，以及绑定精确 Lead 的单次 writer/write 权限。成功一次后立即关闭 M1 并转入 M2，不再扩展 Shadow 架构。
 
 ## Current Work Package
 
-M1-WP05 — Audit Foundation
+`M1-CANDIDATE-READ-PERMISSION-GATE / REQUEST_APPROVAL`
 
-## Overall State
+- pgpass 同进程认证已通过：`aiopc_readonly / aiopc / transaction_read_only=on`；
+- 候选查询因缺少所需列级 SELECT 权限返回 `READONLY_PERMISSION_DENIED`；
+- 精确 GRANT/REVOKE 请求见 `docs/approvals/M1-CANDIDATE-READ-PERMISSION-APPROVAL-REQUEST.md`；
+- Owner 尚未批准权限扩展，Skill 不自动执行 GRANT。
 
-M0 已完成基线冻结。M0.5-WP01-WP06 已完成，PR #2 已由用户合并到 main。M1-WP01 至 M1-WP04 已分别通过 PR #3 至 PR #6 合并到 main。M1-WP05 已在专用工作分支完成本地 Audit Foundation，等待 CI 与第二层审查；未连接数据库，未创建或执行 SQL migration。
+## Reproducible Baseline
 
-## Recently Completed
+- 分支：`codex/m1-closeout-shadow-write`；
+- `pg=8.22.0` 已显式锁定；
+- 真实 adapter 固定 `127.0.0.1:15432 / aiopc / aiopc_shadow_writer_m1`；
+- request schema 绑定 writer role、writer/config/candidate/input/scope hash；
+- adapter 拒绝密码、连接串、任意 SQL、任意表名和重试；
+- Draft PR `#12` 已创建；分支已推送但未合并。
 
-- 最新 master architecture v1.0 已在本地工作树中确认。
-- Current System Inventory、Interface Map、Commercial v1.0 Gap Register、M1 Plan 与 M0 progress report 已建立。
-- 本地 typecheck、Phase 1/2、scoring、orchestration 与 orchestration-scoring 测试通过。
-- M0.5-WP01 Project Control Plane 已通过；M0.5-WP02 受限 Git 分支/PR 交付已完成并由用户合并。
-- M0.5 已完成并通过 PR CI；受限 Git、Continuation Protocol、只读入口和进度/审批报告已归档。
-- M1-WP01 已定义 persistence 逻辑实体、scope、version anchors、敏感字段边界与 DRAFT migration 对齐差距，并已归档。
-- M1-WP02 已定义内存 intake run、source item、normalized candidate、tenant-scoped idempotency 和 pending-review 边界。
-- M1-WP03 已定义本地 shadow scope/version anchors、脱敏 explanations、preview 零写入和 tenant-scoped idempotency。
-- M1-WP04 已定义本地 review scope、reviewer identity、append-only decision audit、终态防重复与备注摘要边界。
+## Invariants
 
-## Current Baseline
+- v0.1 `score / grade / priority` 仍是生产评分事实；
+- 锚点：`tenant_id=local`、`config_version=v1`、`engine_version=0.6`、outcome policy=`not-configured`；
+- 单次最多 1 tenant、1 Lead、6 张 Shadow/Audit 表、10 行；
+- 不创建 Review Queue，不修改 `public.leads`，不启用 n8n/Docker/服务器或外联。
 
-- v0.1 score / grade / priority：当前生产评分事实，v0.2 不得覆盖。
-- Phase 1 + Phase 2：本地内存 MVP 可运行。
-- v0.2-v0.7 scoring：本地可运行，生产 persistence 未实施。
-- orchestration：本地 DAG/event/replay 可运行，非持久化 runtime。
-- n8n：仓库存在导出；真实实例和凭据不完整导出。
+## Next Gate
 
-## Current Blockers
+Owner 精确批准 M1 Candidate Read Permission v1.0 后，由数据库管理员执行列级 GRANT；Skill 随后筛选最多 3 条候选、生成 4 小时有效的精确请求并立即撤销候选权限。该批准不包含 writer 或数据库写入。
 
-- 无生产 persistence contract、审批后的 migration、真实 PostgreSQL adapter SQL、审计存储或幂等约束。
-- 无正式 RBAC/approval、受控 workflow runtime、产品 Dashboard、CRM export、outreach/suppression。
+## Latest Verification
 
-## Pull Request Status
-
-- M1-WP02 PR #4 与 M1-WP03 PR #5 已由用户合并到 main。
-- M1-WP04 PR #6 已创建，GitHub Actions CI 为 PASSED。
-- CI 通过不等于自动合并；仍需第二层审查与用户批准。
-
-## Pending Approvals
-
-- M1-WP04 的 CI 与第二层审查。
-- M1-WP05 Audit Foundation 及任何数据库、n8n、服务器、生产或真实外联动作的明确批准。
-- 任一 M1 Work Package 的明确范围。
-- 数据库 schema/migration 草案评审与未来执行授权。
-- 真实单条 shadow 写入、n8n inactive 导入/验证、HTTP server 启动或真实数据接入。
-
-## Latest Test Results
-
-2026-07-11：`typecheck`、`phase1:test`、`phase2:test`、`test:scoring`、`test:orchestration`、`test:orchestration-scoring` 均通过；仅使用本地 memory mode。PowerShell `npm.ps1` 被终端策略阻止，`npm.cmd` 可正常运行。
-
-## Next Work Package
-
-审查 M1-WP04 后，用户可明确批准 M1-WP05 Audit Foundation。任何 migration、数据库写入、n8n 激活或生产动作仍需独立 Gate。
-
-## 验收标准
-
-本文件能让新 Agent 在不读取历史全量文档时识别当前阶段、边界、阻塞和下一个批准点。
-
-## 风险
-
-本文件是时间点快照；任何新 migration、n8n 状态或生产变更都必须以新的受审计状态更新覆盖。
-
-## 回滚原则
-
-若基线事实更新，以新的版本替代当前结论，同时保留历史状态文件用于审计。
-
-## 下一步入口
-
-读取最新 master architecture 与对应的经批准 M1 Work Package。
+- `npm.cmd run test:m1-shadow-client`：PASS；
+- `npm.cmd run test:m1-shadow-writer`：PASS；
+- `npm.cmd run typecheck`：PASS；
+- 数据库写入：0；真实 Lead 摘要读取：0。

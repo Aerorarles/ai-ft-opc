@@ -28,7 +28,7 @@ for (const relativePath of [
 
 requireMatch(control, /id:\s*ai-ft-opc/, "project_id");
 requireMatch(milestone, /id:\s*M\d+(?:\.\d+)?/, "milestone_id");
-requireMatch(workPackage, /status:\s*(PASSED|READY_FOR_REVIEW|IN_PROGRESS|BLOCKED)/, "work_package_status");
-requireMatch(nextAction, /type:\s*(WAIT_FOR_REVIEW|STOP|EXECUTE_WORK_PACKAGE|RUN_TESTS)/, "next_action_type");
+requireMatch(workPackage, /status:\s*(PASSED|READY_FOR_REVIEW|READY_FOR_READONLY_CANDIDATE_APPROVAL|IN_PROGRESS|BLOCKED)/, "work_package_status");
+requireMatch(nextAction, /type:\s*(WAIT_FOR_REVIEW|REQUEST_APPROVAL|STOP|EXECUTE_WORK_PACKAGE|RUN_TESTS)/, "next_action_type");
 
 console.log("PROJECT_CONTROL_VALIDATION_PASS");

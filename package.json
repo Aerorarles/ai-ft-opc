@@ -20,11 +20,18 @@
     "test:m1-review": "tsx apps/api-server/m1-review-persistence-tests.ts",
     "test:m1-audit": "tsx apps/api-server/m1-audit-foundation-tests.ts",
     "test:m1-idempotency": "tsx apps/api-server/m1-idempotency-replay-safety-tests.ts",
-    "test:m1-migration-draft": "tsx apps/api-server/m1-migration-draft-review-tests.ts"
+    "test:m1-migration-draft": "tsx apps/api-server/m1-migration-draft-review-tests.ts",
+    "test:m1-migration-candidate": "tsx apps/api-server/m1-production-migration-candidate-tests.ts",
+    "test:m1-shadow-writer": "tsx apps/api-server/m1-single-lead-shadow-writer-tests.ts",
+    "test:m1-shadow-pgpass": "tsx apps/api-server/m1-shadow-pgpass-entry-tests.ts",
+    "test:m1-shadow-pgpass:live": "tsx apps/api-server/m1-shadow-pgpass-entry-tests.ts --live",
+    "test:m1-shadow-client": "tsx apps/api-server/m1-local-shadow-client-tests.ts"
   },
   "dependencies": {
     "@types/node": "^24.0.8",
     "jest": "^30.0.3",
+    "js-yaml": "3.15.0",
+    "pg": "8.22.0",
     "ts-jest": "^29.4.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",

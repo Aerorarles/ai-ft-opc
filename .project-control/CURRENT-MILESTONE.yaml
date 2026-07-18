@@ -18,5 +18,9 @@ milestone:
     - M1-WP06 Idempotency & Replay Safety passed after PR #8 was merged to main by the user.
     - M1-WP07 Migration Draft Review Package passed after PR #9 was merged to main by the user.
     - M1 exit review passed after PR #10 was merged to main by the user; controlled production persistence is not approved or implemented.
-    - The user approved a restricted database read-only preflight; PR #11 documents the blocked client entry point with GitHub Actions CI passed. No database connection was attempted.
+    - The approved metadata-only database preflight passed without business data reads or writes; DRAFT-005/006/007 target tables are absent and v0.1 trigger metadata remains present.
+    - The M1 Production Migration Execution Package was reviewed, approved for one controlled execution, committed once, and metadata-verified; temporary migration privileges were reclaimed.
+    - Local no-review Shadow Writer hardening is complete and READY_FOR_READONLY_CANDIDATE_APPROVAL. No real Lead row was read and no database write was executed.
+    - M1 closeout is timeboxed to two database gates: temporary candidate read permission, then one exact single-lead Shadow writer/write approval. No additional Shadow architecture is allowed.
+    - A fixed local pg 8.x adapter exists for the future approved role aiopc_shadow_writer_m1; it remains disabled and has not connected as writer.
     - M1 does not authorize database write, migration execution, n8n activation, server change, or real outreach.
